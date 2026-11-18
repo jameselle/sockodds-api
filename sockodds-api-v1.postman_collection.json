@@ -373,7 +373,7 @@
                 }
               ]
             },
-            "description": "Find our event from an official event id: ESPN's event id, the AFL's match id (`CD_M` and digits) for AFLW, or the NRL's match id (digits) for the Rugby League World Cup. Send `ref` for one event, or `refs` for up to 100 at once. With `ref`, the response is the event, or 404 when no event carries that id. With `refs`, the response lists the ids that matched, in the order sent, each with its event; ids that match nothing are left out. A merged event returns the event it was merged into. Only official sources can be looked up, never a bookmaker's listing id. Each event returned counts as one object towards your allowance, like an event read.\n\nReference: https://sockodds.com/docs/#lookupEvents"
+            "description": "Find our event from an official event id: ESPN's event id, the AFL's match id (`CD_M` and digits) for AFLW, or the NRL's match id (digits) for the Rugby League World Cup. Send `ref` for one event, or `refs` for up to 100 at once. With `ref`, the response is the event, or 404 when no event carries that id. With `refs`, the response lists the ids that matched, in the order sent, each with its event; ids that match nothing are left out. A merged event returns the event it was merged into. Only official sources can be looked up, never a bookmaker's listing id. Free: costs no credits.\n\nReference: https://sockodds.com/docs/#lookupEvents"
           },
           "response": []
         },
@@ -473,7 +473,7 @@
                 {
                   "key": "snapshots",
                   "value": "opening,closing",
-                  "description": "Pro and above. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`.",
+                  "description": "Pro and Business only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`.",
                   "disabled": true
                 }
               ],
@@ -485,7 +485,7 @@
                 }
               ]
             },
-            "description": "Current prices for one event, grouped by market: each market and outcome appears once, and each outcome lists every bookmaker's price in `prices`, best price first. Markets come in catalogue order, then period, subject and line; outcomes in the market's side order. Use `group_by=bookmaker` for one block per bookmaker instead (the shape v1 launched with). Each price counts as one object towards your allowance, plus one for the event, in either shape.\n\nReference: https://sockodds.com/docs/#getEventOdds"
+            "description": "Current prices for one event, grouped by market: each market and outcome appears once, and each outcome lists every bookmaker's price in `prices`, best price first. Markets come in catalogue order, then period, subject and line; outcomes in the market's side order. Use `group_by=bookmaker` for one block per bookmaker instead (the shape v1 launched with). Costs the unique markets returned x regions, in credits. See Plans and limits.\n\nReference: https://sockodds.com/docs/#getEventOdds"
           },
           "response": []
         },
@@ -576,7 +576,7 @@
                 }
               ]
             },
-            "description": "Current prices for a page of events (25 by default, up to 100), grouped by market as on /events/{event_id}/odds unless `group_by=bookmaker`. Pages follow events; a cursor works only with the filters and grouping it was issued for, so follow `links.next`. Filters apply to prices before grouping: an outcome or market with no matching price is left out, and an event with none has an empty `markets` list. Each price counts as one object towards your allowance, plus one per event.\n\nReference: https://sockodds.com/docs/#listOdds"
+            "description": "Current prices for a page of events (25 by default, up to 100), grouped by market as on /events/{event_id}/odds unless `group_by=bookmaker`. Pages follow events; a cursor works only with the filters and grouping it was issued for, so follow `links.next`. Filters apply to prices before grouping: an outcome or market with no matching price is left out, and an event with none has an empty `markets` list. Costs credits: featured markets x regions once per page of up to 25 events, other markets per event. See Plans and limits.\n\nReference: https://sockodds.com/docs/#listOdds"
           },
           "response": []
         },
@@ -641,7 +641,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.\n\nReference: https://sockodds.com/docs/#listOddsHistory"
+            "description": "Paid plans only. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.\n\nReference: https://sockodds.com/docs/#listOddsHistory"
           },
           "response": []
         }
@@ -757,7 +757,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.\n\nReference: https://sockodds.com/docs/#listHistoryFiles"
+            "description": "Paid plans only. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing costs 1 credit.\n\nReference: https://sockodds.com/docs/#listHistoryFiles"
           },
           "response": []
         },
@@ -795,7 +795,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.\n\nReference: https://sockodds.com/docs/#getHistoryFile"
+            "description": "Paid plans only. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download costs 100 credits. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.\n\nReference: https://sockodds.com/docs/#getHistoryFile"
           },
           "response": []
         }
@@ -862,7 +862,7 @@
                 }
               ]
             },
-            "description": "Australian and New Zealand races: thoroughbred, harness and greyhound. Rookie and Pro (and the Pro trial); Developer keys get 403. Races come in start order, 25 a page by default, up to 100. With neither starts_after nor starts_before the list runs from 6 hours ago to 48 hours ahead; a window may span at most 8 days. Each race counts as one object. Race ids are SockOdds racing ids such as `thoroughbred_2026-11-17_AUS_scone_r1` (code, date, country, meeting, race number), not the `ev_` ids sport uses.\n\nReference: https://sockodds.com/docs/#listRaces"
+            "description": "Australian and New Zealand races: thoroughbred, harness and greyhound. Paid plans (and the Pro trial); Developer keys get 403. Races come in start order, 25 a page by default, up to 100. With neither starts_after nor starts_before the list runs from 6 hours ago to 48 hours ahead; a window may span at most 8 days. Free: costs no credits. Race ids are SockOdds racing ids such as `thoroughbred_2026-11-17_AUS_scone_r1` (code, date, country, meeting, race number), not the `ev_` ids sport uses.\n\nReference: https://sockodds.com/docs/#listRaces"
           },
           "response": []
         },
@@ -894,7 +894,7 @@
                 }
               ]
             },
-            "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer, weight, claim, form figures, silk colours and whether it is scratched or an emergency; and the race's class and conditions, prize money, track condition, weather, rail position and places paid, as stated on the TAB race page (null until that page has been read). `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null; the full result with dividends is at `/racing/races/{race_id}/result`.\n\nReference: https://sockodds.com/docs/#getRace"
+            "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer, weight, claim, form figures, silk colours and whether it is scratched or an emergency; and the race's class and conditions, prize money, track condition, weather, rail position and places paid, as stated on the TAB race page (null until that page has been read). `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null; the full result with dividends is at `/racing/races/{race_id}/result`. Free: costs no credits.\n\nReference: https://sockodds.com/docs/#getRace"
           },
           "response": []
         },
@@ -929,7 +929,7 @@
                 {
                   "key": "snapshots",
                   "value": "opening,closing",
-                  "description": "Pro only. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped.",
+                  "description": "Pro and Business only. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped.",
                   "disabled": true
                 }
               ],
@@ -941,7 +941,7 @@
                 }
               ]
             },
-            "description": "Current fixed-odds win and place prices for every runner, one entry per bookmaker, and Betfair Exchange back and lay prices with the size available and the volume matched (AUD). `available` is true while the race has not jumped and the price was observed in the last 600 seconds. Scratched runners carry no prices. Rookie sees the bookmakers its plan names. The race counts as one object.\n\nReference: https://sockodds.com/docs/#getRaceOdds"
+            "description": "Current fixed-odds win and place prices for every runner, one entry per bookmaker, and Betfair Exchange back and lay prices with the size available and the volume matched (AUD). `available` is true while the race has not jumped and the price was observed in the last 600 seconds. Scratched runners carry no prices. Costs 1 credit per region, 5 with opening and closing prices. See Plans and limits.\n\nReference: https://sockodds.com/docs/#getRaceOdds"
           },
           "response": []
         },
@@ -998,7 +998,7 @@
                 }
               ]
             },
-            "description": "Pro only. Every recorded change of a win or place price for one race, by runner and bookmaker, in observation order. A window may span at most 24 hours; racing movement is recorded from 16 November 2026 23:09 UTC. At most `limit` changes are returned; `meta.truncated` is true when the window may hold more, so ask again from the last `observed_at`.\n\nReference: https://sockodds.com/docs/#listRaceHistory"
+            "description": "Paid plans only. Every recorded change of a win or place price for one race, by runner and bookmaker, in observation order. A window may span at most 24 hours; racing movement is recorded from 16 November 2026 23:09 UTC. At most `limit` changes are returned; `meta.truncated` is true when the window may hold more, so ask again from the last `observed_at`.\n\nReference: https://sockodds.com/docs/#listRaceHistory"
           },
           "response": []
         },
@@ -1060,7 +1060,7 @@
                 }
               ]
             },
-            "description": "Race meetings: one racing code at one track on one day, each with its races in start order and the track condition, weather and rail position last stated for it. Same plans, filters and window as the races list (6 hours ago to 48 hours ahead by default, at most 8 days). A meeting id is its races' id without the race number, such as `thoroughbred_2026-11-17_AUS_scone`. Each meeting counts as one object.\n\nReference: https://sockodds.com/docs/#listMeetings"
+            "description": "Race meetings: one racing code at one track on one day, each with its races in start order and the track condition, weather and rail position last stated for it. Same plans, filters and window as the races list (6 hours ago to 48 hours ahead by default, at most 8 days). A meeting id is its races' id without the race number, such as `thoroughbred_2026-11-17_AUS_scone`. Free: costs no credits.\n\nReference: https://sockodds.com/docs/#listMeetings"
           },
           "response": []
         },
@@ -1122,7 +1122,7 @@
                 }
               ]
             },
-            "description": "Resulted races in start order, each with its placings (runner number, position, name, and the TAB fixed and tote prices the placegetters paid), scratchings with their deductions, tote pool totals and tote dividends (win, place, quinella, exacta, trifecta, first four and the multi-race pools TAB declared). With no window the list covers the last 24 hours; a window may span at most 8 days. Results exist from 1 August 2026; dividends and prices paid come with them where the TAB result page was recorded. Each race counts as one object.\n\nReference: https://sockodds.com/docs/#listRaceResults"
+            "description": "Resulted races in start order, each with its placings (runner number, position, name, and the TAB fixed and tote prices the placegetters paid), scratchings with their deductions, tote pool totals and tote dividends (win, place, quinella, exacta, trifecta, first four and the multi-race pools TAB declared). With no window the list covers the last 24 hours; a window may span at most 8 days. Results exist from 1 August 2026; dividends and prices paid come with them where the TAB result page was recorded. Costs 2 credits a call.\n\nReference: https://sockodds.com/docs/#listRaceResults"
           },
           "response": []
         },
@@ -1155,7 +1155,7 @@
                 }
               ]
             },
-            "description": "The full result of one race: placings with the prices paid (TAB fixed win and place, tote win and place, and Betfair Starting Price), scratchings with deductions, tote pools and dividends, and `betfair_sp`: the Betfair Starting Price of every runner for win and place with the pre-play and in-play traded range and volume (AUD), from Betfair's published BSP files (Australian races; they arrive the day after the race). `result` is null until the race is resulted. Positions are the placegetters' (first four).\n\nReference: https://sockodds.com/docs/#getRaceResult"
+            "description": "The full result of one race: placings with the prices paid (TAB fixed win and place, tote win and place, and Betfair Starting Price), scratchings with deductions, tote pools and dividends, and `betfair_sp`: the Betfair Starting Price of every runner for win and place with the pre-play and in-play traded range and volume (AUD), from Betfair's published BSP files (Australian races; they arrive the day after the race). `result` is null until the race is resulted. Positions are the placegetters' (first four). Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getRaceResult"
           },
           "response": []
         },
@@ -1188,7 +1188,7 @@
                 }
               ]
             },
-            "description": "TAB tote pools for one race: the total in each pool (AUD), each runner's tote win and place dividend, and, once the race is resulted, the declared dividends by pool. `stage` is `approximate` while betting is open (the dividends move with the pool until it closes) and `final` after the result; null when the pools have not been read yet. Read about every 20 minutes in the three hours before a race and every minute in the last 15.\n\nReference: https://sockodds.com/docs/#getRaceTote"
+            "description": "TAB tote pools for one race: the total in each pool (AUD), each runner's tote win and place dividend, and, once the race is resulted, the declared dividends by pool. `stage` is `approximate` while betting is open (the dividends move with the pool until it closes) and `final` after the result; null when the pools have not been read yet. Read about every 20 minutes in the three hours before a race and every minute in the last 15. Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getRaceTote"
           },
           "response": []
         },
@@ -1256,7 +1256,7 @@
                 }
               ]
             },
-            "description": "Pro only. Market movers across races still to run: for each runner the opening win price (the first price any bookmaker showed, and who) against the median and the best current fixed-odds win price, largest move first. `change` is (median now - opening) / opening: negative is firming, positive is drifting. Only prices observed in the last 600 seconds count, Betfair Exchange is not part of the median, and a runner whose opening price came from a bookmaker outside your request is left out. Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds.\n\nReference: https://sockodds.com/docs/#listRaceMovers"
+            "description": "Pro and Business only. Market movers across races still to run: for each runner the opening win price (the first price any bookmaker showed, and who) against the median and the best current fixed-odds win price, largest move first. `change` is (median now - opening) / opening: negative is firming, positive is drifting. Only prices observed in the last 600 seconds count, Betfair Exchange is not part of the median, and a runner whose opening price came from a bookmaker outside your request is left out. Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.\n\nReference: https://sockodds.com/docs/#listRaceMovers"
           },
           "response": []
         },
@@ -1324,7 +1324,7 @@
                 }
               ]
             },
-            "description": "Pro only. Racing arbs on the win market in races still to run: the best fixed-odds win price at a bookmaker against the Betfair Exchange win lay price, where backing at the bookmaker and laying on the exchange returns a profit whichever way the race goes. `margin` = back x (1 - commission) / (lay - commission) - 1, the profit per unit staked on the back bet; `lay_stake_per_unit` = back / (lay - commission). `commission` is the exchange commission you pay (0.05 unless you pass yours; `meta.commission` echoes it). Both prices were observed in the last 600 seconds; `lay.size` is the AUD available at the lay price, so check it covers your lay stake, and check both prices before betting. Place markets are not compared (place terms differ between a bookmaker and the exchange). Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds.\n\nReference: https://sockodds.com/docs/#listRaceArbs"
+            "description": "Pro and Business only. Racing arbs on the win market in races still to run: the best fixed-odds win price at a bookmaker against the Betfair Exchange win lay price, where backing at the bookmaker and laying on the exchange returns a profit whichever way the race goes. `margin` = back x (1 - commission) / (lay - commission) - 1, the profit per unit staked on the back bet; `lay_stake_per_unit` = back / (lay - commission). `commission` is the exchange commission you pay (0.05 unless you pass yours; `meta.commission` echoes it). Both prices were observed in the last 600 seconds; `lay.size` is the AUD available at the lay price, so check it covers your lay stake, and check both prices before betting. Place markets are not compared (place terms differ between a bookmaker and the exchange). Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.\n\nReference: https://sockodds.com/docs/#listRaceArbs"
           },
           "response": []
         },
@@ -1365,7 +1365,7 @@
                 }
               ]
             },
-            "description": "Form for every runner of a race: `form_figures` (the last-starts figures shown on the TAB race page, newest last) and `starts`, the runner's last starts before this race that SockOdds recorded, newest first: date, meeting, distance, class, track condition, jockey, trainer, barrier, weight, finishing position, field size and the prices it started at (TAB fixed, tote, Betfair SP). Recorded starts begin on 1 August 2026 (`meta.recorded_from`), so a runner's earlier career is not listed. `position` is 1 to 4 for a placegetter and null for a runner that finished further back. Runners are matched by name within a racing code.\n\nReference: https://sockodds.com/docs/#getRaceForm"
+            "description": "Form for every runner of a race: `form_figures` (the last-starts figures shown on the TAB race page, newest last) and `starts`, the runner's last starts before this race that SockOdds recorded, newest first: date, meeting, distance, class, track condition, jockey, trainer, barrier, weight, finishing position, field size and the prices it started at (TAB fixed, tote, Betfair SP). Recorded starts begin on 1 August 2026 (`meta.recorded_from`), so a runner's earlier career is not listed. `position` is 1 to 4 for a placegetter and null for a runner that finished further back. Runners are matched by name within a racing code. Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getRaceForm"
           },
           "response": []
         },
@@ -1408,7 +1408,7 @@
                 }
               ]
             },
-            "description": "One runner's recorded starts, newest first, by racing code and name (case, punctuation and a country suffix such as (NZ) are ignored). The same fields as a race's form. Recorded starts begin on 1 August 2026.\n\nReference: https://sockodds.com/docs/#getRunnerForm"
+            "description": "One runner's recorded starts, newest first, by racing code and name (case, punctuation and a country suffix such as (NZ) are ignored). The same fields as a race's form. Recorded starts begin on 1 August 2026. Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getRunnerForm"
           },
           "response": []
         },
@@ -1449,7 +1449,7 @@
                 }
               ]
             },
-            "description": "Strike rates for each runner's jockey (the driver in harness), trainer and the jockey and trainer together, over the `days` before the race: starts, wins, seconds, thirds, `win_rate` (wins / starts) and `place_rate` (first three / starts). Counted only from races SockOdds recorded (from 1 August 2026) in the same racing code, so they are rates over that record, not career figures. Greyhounds have a trainer only.\n\nReference: https://sockodds.com/docs/#getRaceConnections"
+            "description": "Strike rates for each runner's jockey (the driver in harness), trainer and the jockey and trainer together, over the `days` before the race: starts, wins, seconds, thirds, `win_rate` (wins / starts) and `place_rate` (first three / starts). Counted only from races SockOdds recorded (from 1 August 2026) in the same racing code, so they are rates over that record, not career figures. Greyhounds have a trainer only. Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getRaceConnections"
           },
           "response": []
         },
@@ -1498,7 +1498,7 @@
                 }
               ]
             },
-            "description": "Strike rates for one jockey (or driver), one trainer, or the two together, by name within a racing code, over the last `days` days of recorded races: starts, wins, seconds, thirds, win and place rate, and the first and last recorded start. Give `jockey`, `trainer` or both.\n\nReference: https://sockodds.com/docs/#getConnectionStats"
+            "description": "Strike rates for one jockey (or driver), one trainer, or the two together, by name within a racing code, over the last `days` days of recorded races: starts, wins, seconds, thirds, win and place rate, and the first and last recorded start. Give `jockey`, `trainer` or both. Costs 1 credit a call.\n\nReference: https://sockodds.com/docs/#getConnectionStats"
           },
           "response": []
         }
@@ -1570,7 +1570,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Arbitrage: two prices at two different bookmakers that cover both sides of one market, so backing both in the listed proportions returns a profit whichever side wins. Upcoming events only, best profit first, 25 a page by default, up to 100. The list is recomputed about every four minutes from the prices SockOdds records; each entry carries the time each price was observed, when the entry was computed and when it expires. By default an entry is listed only while both prices were observed in the last 600 seconds (`max_age`). Only bookmakers your key may read are used. Each entry counts as one object. Prices move: check the price at the bookmaker before acting on any entry.\n\nReference: https://sockodds.com/docs/#listArbitrage"
+            "description": "Pro and above. Arbitrage: two prices at two different bookmakers that cover both sides of one market, so backing both in the listed proportions returns a profit whichever side wins. Upcoming events only, best profit first, 25 a page by default, up to 100. The list is recomputed about every four minutes from the prices SockOdds records; each entry carries the time each price was observed, when the entry was computed and when it expires. By default an entry is listed only while both prices were observed in the last 600 seconds (`max_age`). Only bookmakers your key may read are used. Costs 10 credits a call; an empty answer costs nothing. Prices move: check the price at the bookmaker before acting on any entry.\n\nReference: https://sockodds.com/docs/#listArbitrage"
           },
           "response": []
         },
@@ -1856,7 +1856,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Each event counts as one object.\n\nReference: https://sockodds.com/docs/#listFairOdds"
+            "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Costs 5 credits a call; an empty answer costs nothing.\n\nReference: https://sockodds.com/docs/#listFairOdds"
           },
           "response": []
         },
@@ -1984,7 +1984,7 @@
                 }
               ]
             },
-            "description": "Pro and above. The closing line of one event: each bookmaker's opening and closing price per outcome (as `snapshots=opening,closing` returns them), the fair closing price per outcome (`closing_fair`, built from the closing prices as `/fair-odds` builds a fair price) and `opening_clv_pct`, the closing line value of each bookmaker's opening price: how far that price beat the fair closing price, in percent (positive beat the close). Give `outcome_id` and `odds` together to get the closing line value of your own bet in `bet`. Without `markets` the main markets are read (winner, result, handicap and the game totals); name up to 20 market keys for others. Closing prices are null until the event has started. Counted like event odds: one object for the event plus one per bookmaker price.\n\nReference: https://sockodds.com/docs/#getEventClosing"
+            "description": "Pro and above. The closing line of one event: each bookmaker's opening and closing price per outcome (as `snapshots=opening,closing` returns them), the fair closing price per outcome (`closing_fair`, built from the closing prices as `/fair-odds` builds a fair price) and `opening_clv_pct`, the closing line value of each bookmaker's opening price: how far that price beat the fair closing price, in percent (positive beat the close). Give `outcome_id` and `odds` together to get the closing line value of your own bet in `bet`. Without `markets` the main markets are read (winner, result, handicap and the game totals); name up to 20 market keys for others. Closing prices are null until the event has started. Costs 10 credits a call.\n\nReference: https://sockodds.com/docs/#getEventClosing"
           },
           "response": []
         },
@@ -2054,7 +2054,7 @@
                 }
               ]
             },
-            "description": "Pro and above. Line moves in one league: markets whose main line (handicap, totals, player and team over/unders) changed at one or more bookmakers in the last `window` minutes, upcoming events only. Each bookmaker counts once, by its net move in the window (a line that moved and came back is not a move). `steam` is true when at least `min_books` bookmakers moved the same way and they are at least two thirds of the bookmakers that moved; `sharp` is true when Pinnacle is among them. `from_line` and `to_line` are the median line of those bookmakers before and after; for a handicap the line is the home side's (competitor 1 in tennis). Steam first, then the most bookmakers. Lines are sampled every few minutes, so a move is timed to the sample that first saw it. Markets with no line (head to head) are not covered. Each market counts as one object.\n\nReference: https://sockodds.com/docs/#listLineMoves"
+            "description": "Pro and above. Line moves in one league: markets whose main line (handicap, totals, player and team over/unders) changed at one or more bookmakers in the last `window` minutes, upcoming events only. Each bookmaker counts once, by its net move in the window (a line that moved and came back is not a move). `steam` is true when at least `min_books` bookmakers moved the same way and they are at least two thirds of the bookmakers that moved; `sharp` is true when Pinnacle is among them. `from_line` and `to_line` are the median line of those bookmakers before and after; for a handicap the line is the home side's (competitor 1 in tennis). Steam first, then the most bookmakers. Lines are sampled every few minutes, so a move is timed to the sample that first saw it. Markets with no line (head to head) are not covered. Costs 10 credits a call; an empty answer costs nothing.\n\nReference: https://sockodds.com/docs/#listLineMoves"
           },
           "response": []
         }
