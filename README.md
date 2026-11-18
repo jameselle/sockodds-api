@@ -181,7 +181,7 @@ The refresh script tidies two things in the published file: a few descriptions t
 
 ## Plans and pricing
 
-There is a free Developer key for building and testing, and paid plans add bookmakers, leagues, recorded history and streaming. Limits are counted in requests a minute and objects a month. Plans and limits change, so this README does not repeat them: see [pricing](https://sockodds.com/pricing/) and [plans and limits](https://sockodds.com/docs/limits/).
+There is a free key for building and testing, and paid plans add bookmakers, leagues, recorded history and streaming. Plans, limits and how usage is metered change from time to time, so this README does not repeat them: see [pricing](https://sockodds.com/pricing/) and [plans and limits](https://sockodds.com/docs/limits/), and re-run `scripts/refresh_openapi.py` to pick up contract changes.
 
 ## Develop
 
