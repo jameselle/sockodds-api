@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Track line movement: how each bookmaker's winner price moved over a window, from recorded history.
 #
-#   export SOCKODDS_API_KEY="your-key"     # Pro plan (history): https://sockodds.com/pricing/
+#   export SOCKODDS_API_KEY="your-key"     # paid plan (history): https://sockodds.com/pricing/
 #   ./line-movement.sh EVENT_ID [FROM TO]
 #
 # FROM and TO are UTC times such as 2026-12-05T00:00:00Z; the default is the last 8 hours (at most

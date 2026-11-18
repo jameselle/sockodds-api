@@ -1,6 +1,6 @@
 // Track line movement: how each bookmaker's winner price moved over a window, from recorded history.
 //
-//   export SOCKODDS_API_KEY="your-key"     # Pro plan (history): https://sockodds.com/pricing/
+//   export SOCKODDS_API_KEY="your-key"     # paid plan (history): https://sockodds.com/pricing/
 //   node line-movement.mjs EVENT_ID [FROM TO]
 //
 // FROM and TO are UTC times such as 2026-12-05T00:00:00Z; the default is the last 8 hours. A window
@@ -20,7 +20,7 @@ async function get(path, params = {}) {
     // errors are application/problem+json
     const problem = await response.json().catch(() => ({}));
     let message = `${problem.title ?? response.statusText}: ${problem.detail ?? ""}`;
-    if (response.status === 403) message += " (recorded history is on the Pro plan: https://sockodds.com/pricing/)";
+    if (response.status === 403) message += " (recorded history is on every paid plan: https://sockodds.com/pricing/)";
     console.error(`HTTP ${response.status} from ${url.split("?")[0]}: ${message}`);
     process.exit(1);
   }

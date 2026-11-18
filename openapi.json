@@ -339,7 +339,7 @@
                 "opening,closing"
               ]
             },
-            "description": "Pro and Business only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`."
+            "description": "Pro and above. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`."
           }
         ],
         "responses": {
@@ -410,7 +410,7 @@
           "Prices"
         ],
         "operationId": "streamOdds",
-        "description": "Pro and Business only. Upgrade to a WebSocket with your bearer key to receive the current prices for one event, or for up to 20 events in one league, every 15 seconds. Each message is a JSON object whose `type` is `snapshot` (the same body as the matching odds route, grouped by market unless `group_by=bookmaker`), `heartbeat` (nothing changed) or `error` (a problem object, after which the connection closes). A refresh counts towards your allowance like an ordinary odds request only when it sends a new snapshot; a heartbeat (nothing changed) is free. Every refresh still counts towards your per minute request limit. Up to two streams per key. A stream lasts at most one hour; reconnect for a fresh one. The stream is read only; a message from the client closes it. Close codes are 1000 (lifetime reached), 1008 (key, plan or limit change), 1009 (snapshot too large, narrow the filters), 1011 (refresh failed) and 1013 (client reading too slowly).",
+        "description": "Pro and above. Upgrade to a WebSocket with your bearer key to receive the current prices for one event, or for up to 20 events in one league, every 15 seconds. Each message is a JSON object whose `type` is `snapshot` (the same body as the matching odds route, grouped by market unless `group_by=bookmaker`), `heartbeat` (nothing changed) or `error` (a problem object, after which the connection closes). A refresh counts towards your allowance like an ordinary odds request only when it sends a new snapshot; a heartbeat (nothing changed) is free. Every refresh still counts towards your per minute request limit. Up to two streams per key. A stream lasts at most one hour; reconnect for a fresh one. The stream is read only; a message from the client closes it. Close codes are 1000 (lifetime reached), 1008 (key, plan or limit change), 1009 (snapshot too large, narrow the filters), 1011 (refresh failed) and 1013 (client reading too slowly).",
         "x-websocket": {
           "refresh_seconds": 15,
           "max_lifetime_seconds": 3600,
@@ -617,7 +617,7 @@
           "Results"
         ],
         "operationId": "listResults",
-        "description": "Settled outcomes for finished events, graded from official result sources. Each outcome's `verdict` is `won`, `lost`, `void` (stake returned), `dead_heat`, `half_won` or `half_lost`. `half_won` / `half_lost` settle an Asian quarter line (x.25 / x.75) whose two half stakes split: one half won (or lost) at the quoted price and the other half refunded. A dead heat pays `dead_heat_factor` of the stake at the quoted price and loses the rest: a drawn AFL or AFLW head-to-head, a drawn AFLW quarter or half winner, a tied NBL quarter or half winner, and a Rugby League World Cup head-to-head still level after golden point, is a dead heat with a factor of 0.5. Outcomes that official evidence cannot settle are left out, never guessed. Each market settles on its own once official evidence settles all of its outcomes, so a result can be published while other markets on the event are still pending: `settlement` is `partial` and `pending_markets` counts them, and later results for the same event add the newly settled outcomes without changing any verdict already published. Each result also carries `box_score`: the official statistics the result is graded from (score by period, event and team totals, the player statistics SockOdds grades by player ID, and any athletes the source lists that the player registry cannot identify), or null until they have been read.",
+        "description": "Settled outcomes for finished events, graded from official result sources. Each outcome's `verdict` is `won`, `lost`, `void` (stake returned), `dead_heat`, `half_won` or `half_lost`. `half_won` / `half_lost` settle an Asian quarter line (x.25 / x.75) whose two half stakes split: one half won (or lost) at the quoted price and the other half refunded. A dead heat pays `dead_heat_factor` of the stake at the quoted price and loses the rest: a drawn AFL or AFLW head-to-head, a drawn AFLW quarter or half winner, a tied NBL quarter or half winner, and a Rugby League World Cup head-to-head still level after golden point, is a dead heat with a factor of 0.5; a cricket team top batter or top bowler board (`team_runs_most`, `team_wickets_most`, `team_wickets_most_dead_heat`) with n players level pays a factor of 1/n. On those three boards a runner proven not in the starting XI is `void` with `void_reason` `non_participant`: the bookmakers settle that case by their own rule (the price's `non_participant`: `void` refunds it, `loses` settles it lost), while a void without a `void_reason` (a board voided because the match was abandoned, no wicket fell or a Test innings fell short) is void at every bookmaker. Outcomes that official evidence cannot settle are left out, never guessed. Each market settles on its own once official evidence settles all of its outcomes, so a result can be published while other markets on the event are still pending: `settlement` is `partial` and `pending_markets` counts them, and later results for the same event add the newly settled outcomes without changing any verdict already published. Each result also carries `box_score`: the official statistics the result is graded from (score by period, event and team totals, the player statistics SockOdds grades by player ID, and any athletes the source lists that the player registry cannot identify), or null until they have been read. `GET /v1/events/{event_id}` carries the same `box_score` for a finished event.",
         "parameters": [
           {
             "$ref": "#/components/parameters/League"
@@ -759,7 +759,7 @@
                 "opening,closing"
               ]
             },
-            "description": "Pro and Business only. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped."
+            "description": "Pro and above. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped."
           }
         ],
         "responses": {
@@ -993,7 +993,7 @@
           "Racing"
         ],
         "operationId": "listRaceMovers",
-        "description": "Pro and Business only. Market movers across races still to run: for each runner the opening win price (the first price any bookmaker showed, and who) against the median and the best current fixed-odds win price, largest move first. `change` is (median now - opening) / opening: negative is firming, positive is drifting. Only prices observed in the last 600 seconds count, Betfair Exchange is not part of the median, and a runner whose opening price came from a bookmaker outside your request is left out. Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.",
+        "description": "Pro and above. Market movers across races still to run: for each runner the opening win price (the first price any bookmaker showed, and who) against the median and the best current fixed-odds win price, largest move first. `change` is (median now - opening) / opening: negative is firming, positive is drifting. Only prices observed in the last 600 seconds count, Betfair Exchange is not part of the median, and a runner whose opening price came from a bookmaker outside your request is left out. Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.",
         "parameters": [
           {
             "in": "query",
@@ -1074,7 +1074,7 @@
           "Racing"
         ],
         "operationId": "listRaceArbs",
-        "description": "Pro and Business only. Racing arbs on the win market in races still to run: the best fixed-odds win price at a bookmaker against the Betfair Exchange win lay price, where backing at the bookmaker and laying on the exchange returns a profit whichever way the race goes. `margin` = back x (1 - commission) / (lay - commission) - 1, the profit per unit staked on the back bet; `lay_stake_per_unit` = back / (lay - commission). `commission` is the exchange commission you pay (0.05 unless you pass yours; `meta.commission` echoes it). Both prices were observed in the last 600 seconds; `lay.size` is the AUD available at the lay price, so check it covers your lay stake, and check both prices before betting. Place markets are not compared (place terms differ between a bookmaker and the exchange). Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.",
+        "description": "Pro and above. Racing arbs on the win market in races still to run: the best fixed-odds win price at a bookmaker against the Betfair Exchange win lay price, where backing at the bookmaker and laying on the exchange returns a profit whichever way the race goes. `margin` = back x (1 - commission) / (lay - commission) - 1, the profit per unit staked on the back bet; `lay_stake_per_unit` = back / (lay - commission). `commission` is the exchange commission you pay (0.05 unless you pass yours; `meta.commission` echoes it). Both prices were observed in the last 600 seconds; `lay.size` is the AUD available at the lay price, so check it covers your lay stake, and check both prices before betting. Place markets are not compared (place terms differ between a bookmaker and the exchange). Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds. Costs 10 credits a call.",
         "parameters": [
           {
             "in": "query",
@@ -1526,7 +1526,7 @@
           "Analysis"
         ],
         "operationId": "listFairOdds",
-        "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Costs 5 credits a call; an empty answer costs nothing.",
+        "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. A price more than 25% above the fair price is chosen only when a second bookmaker also prices the outcome more than 25% above it; otherwise the next best price is. Once an event has started, its fair and best prices use only prices observed since its start. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Costs 5 credits a call; an empty answer costs nothing.",
         "x-example-query": "league=nba&markets=winner,handicap,total_points&limit=5",
         "parameters": [
           {
@@ -1856,7 +1856,7 @@
       "NonParticipantFilter": {
         "in": "query",
         "name": "non_participant",
-        "description": "Comma-separated non-participation rules (`void`, `loses`, `under`, `fair_price`). Keeps only player-market prices whose bookmaker settles a player who takes no part by one of these rules; prices on every other market are unaffected. For example `non_participant=void` keeps only player prices that are refunded when the player does not play.",
+        "description": "Comma-separated non-participation rules (`void`, `loses`, `under`, `fair_price`). Keeps only player-market prices whose bookmaker settles a player who takes no part by one of these rules; on the cricket team top boards (`team_runs_most`, `team_wickets_most`, `team_wickets_most_dead_heat`) it applies to prices that carry a rule, and a price there without one is kept. Prices on every other market are unaffected. For example `non_participant=void` keeps only player prices that are refunded when the player does not play.",
         "schema": {
           "type": "string"
         }
@@ -1866,16 +1866,6 @@
         "name": "cursor",
         "schema": {
           "type": "string"
-        }
-      },
-      "Limit": {
-        "in": "query",
-        "name": "limit",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 25
         }
       },
       "RaceId": {
@@ -1908,6 +1898,16 @@
             "power"
           ],
           "default": "proportional"
+        }
+      },
+      "Limit": {
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 25
         }
       }
     },
@@ -2086,7 +2086,7 @@
                 }
               },
               "non_participant": {
-                "description": "Player markets only. The non-participation rules a price on this market may carry (see the `non_participant` of each price in the odds routes). Every player-market price carries one.",
+                "description": "Player markets, and the cricket team top boards (`team_runs_most`, `team_wickets_most`, `team_wickets_most_dead_heat`; `void` and `loses` only, listed only when the request names `league=cricket`, the one league where a price on them may carry a rule). The non-participation rules a price on this market may carry (see the `non_participant` of each price in the odds routes). Every player-market price carries one; a cricket team top board price carries one when its bookmaker's rule has been stated.",
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/NonParticipant"
@@ -2225,6 +2225,10 @@
           "participants"
         ],
         "properties": {
+          "box_score": {
+            "$ref": "#/components/schemas/BoxScore",
+            "description": "GET /v1/events/{event_id} only: present for a finished event once its official box score has been read."
+          },
           "id": {
             "$ref": "#/components/schemas/EventId"
           },
@@ -2460,9 +2464,6 @@
           "observed_at"
         ],
         "properties": {
-          "liquidity": {
-            "$ref": "#/components/schemas/ExchangeLiquidity"
-          },
           "id": {
             "$ref": "#/components/schemas/OutcomeId"
           },
@@ -2495,16 +2496,22 @@
             "exclusiveMinimum": 0,
             "maximum": 1
           },
+          "max_stake": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Optional Circa first-party standard maximum risk amount in USD at this price. Present only on available quotes with a verified current limit. Missing means unknown. Not an account-specific guarantee; excludes exchange depth and other internal liquidity."
+          },
           "available": {
             "type": "boolean",
             "description": "Whether the current quote is available and fresh. Stale or withdrawn quotes appear only when snapshots are requested and carry null current prices."
           },
           "alternate": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True when this line is not this bookmaker's own main line. Each bookmaker has one main line per market (its own line, which can differ from other bookmakers'); alternate lines appear only with alternates=true."
           },
           "non_participant": {
             "$ref": "#/components/schemas/NonParticipant",
-            "description": "Player markets only, and only when the rule is not `void`: this shape stays byte for byte the launch body, so an absent value on a player market means `void`. Grouped by market, every player price carries it."
+            "description": "Player markets and the cricket team top boards only, and only when the rule is not `void`: this shape stays byte for byte the launch body, so an absent value on a player market means `void`. Grouped by market, every player price carries it, and a cricket team top board price carries it when its bookmaker's rule has been stated."
           },
           "bookmaker": {
             "$ref": "#/components/schemas/Key"
@@ -2534,6 +2541,9 @@
               }
             ],
             "description": "The last quote before the `snapshots` cutoff. Null when there is none. For every sport but MMA it is also null when that last row is a withdrawal (the book pulled the price before `scheduled_start`); it never falls back to an earlier price. For an MMA bout withdrawals are skipped, so closing is the last price offered before the cutoff."
+          },
+          "liquidity": {
+            "$ref": "#/components/schemas/ExchangeLiquidity"
           }
         }
       },
@@ -2545,7 +2555,7 @@
           "under",
           "fair_price"
         ],
-        "description": "Player markets only: how this bookmaker settles this price when the player takes no part, from the bookmaker's own published rules. `void`: the stake is returned. `loses`: all-in, the bet stands and loses. `under`: the bet settles as the Under (or No) side. `fair_price`: the venue settles at a fair price it sets. /v1/results grades the outcomes of a player who took no part `void`; a price whose rule is not `void` settles differently at that bookmaker."
+        "description": "Player markets, and the cricket team top boards (`team_runs_most`, `team_wickets_most`, `team_wickets_most_dead_heat`: a runner not in the starting XI; `void` or `loses` only): how this bookmaker settles this price when the player takes no part, from the bookmaker's own published rules. `void`: the stake is returned. `loses`: all-in, the bet stands and loses. `under`: the bet settles as the Under (or No) side. `fair_price`: the venue settles at a fair price it sets. /v1/results grades the outcomes of a player who took no part `void`; a price whose rule is not `void` settles differently at that bookmaker. On the cricket team top boards that void carries `void_reason` `non_participant`."
       },
       "PriceSnapshot": {
         "type": "object",
@@ -2583,12 +2593,6 @@
           "outcomes"
         ],
         "properties": {
-          "exchanges": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExchangeMarket"
-            }
-          },
           "id": {
             "$ref": "#/components/schemas/MarketId"
           },
@@ -2632,6 +2636,12 @@
             "items": {
               "$ref": "#/components/schemas/Outcome"
             }
+          },
+          "exchanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeMarket"
+            }
           }
         }
       },
@@ -2647,9 +2657,6 @@
           "observed_at"
         ],
         "properties": {
-          "liquidity": {
-            "$ref": "#/components/schemas/ExchangeLiquidity"
-          },
           "bookmaker": {
             "$ref": "#/components/schemas/Key"
           },
@@ -2667,6 +2674,11 @@
             ],
             "exclusiveMinimum": 0,
             "maximum": 1
+          },
+          "max_stake": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Optional Circa first-party standard maximum risk amount in USD at this price. Present only on available quotes with a verified current limit. Missing means unknown. Not an account-specific guarantee; excludes exchange depth and other internal liquidity."
           },
           "available": {
             "type": "boolean",
@@ -2700,6 +2712,9 @@
           "observed_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "liquidity": {
+            "$ref": "#/components/schemas/ExchangeLiquidity"
           }
         }
       },
@@ -2754,12 +2769,6 @@
           "outcomes"
         ],
         "properties": {
-          "exchanges": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExchangeMarket"
-            }
-          },
           "id": {
             "$ref": "#/components/schemas/MarketId"
           },
@@ -2800,7 +2809,7 @@
           },
           "alternate": {
             "type": "boolean",
-            "description": "True when this line is not the market's main line. Alternate lines appear only with alternates=true."
+            "description": "True when this line is an alternate at every bookmaker pricing it here, false when it is at least one bookmaker's own main line. Each bookmaker has one main line per market, so by default a market lists each bookmaker's main line; alternate lines appear only with alternates=true."
           },
           "outcomes": {
             "type": "array",
@@ -2808,6 +2817,12 @@
             "description": "In the market's side order (home, draw, away; over, under); players and scores by name.",
             "items": {
               "$ref": "#/components/schemas/PricedOutcome"
+            }
+          },
+          "exchanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeMarket"
             }
           }
         }
@@ -3383,6 +3398,15 @@
                   ]
                 }
               },
+              "dependentSchemas": {
+                "void_reason": {
+                  "properties": {
+                    "verdict": {
+                      "const": "void"
+                    }
+                  }
+                }
+              },
               "properties": {
                 "id": {
                   "$ref": "#/components/schemas/OutcomeId"
@@ -3407,6 +3431,13 @@
                   "exclusiveMinimum": 0,
                   "exclusiveMaximum": 1,
                   "description": "Dead heats only: the share of the stake paid at the quoted price. The rest of the stake is lost."
+                },
+                "void_reason": {
+                  "type": "string",
+                  "enum": [
+                    "non_participant"
+                  ],
+                  "description": "Voids only, and today only on the cricket team top boards (`team_runs_most`, `team_wickets_most`, `team_wickets_most_dead_heat`): why the outcome is void. `non_participant`: the runner was not in the starting XI, so the bet settles by the price's own `non_participant` rule (`void`: refunded; `loses`: lost at an all-in bookmaker). Absent on every other outcome, and on a void that every bookmaker settles as void. A result graded before this field existed may carry a void without it."
                 },
                 "market": {
                   "$ref": "#/components/schemas/RecordedMarket"
@@ -5713,16 +5744,6 @@
           }
         }
       },
-      "Problem": {
-        "description": "Request failed",
-        "content": {
-          "application/problem+json": {
-            "schema": {
-              "$ref": "#/components/schemas/Problem"
-            }
-          }
-        }
-      },
       "Races": {
         "description": "Races",
         "content": {
@@ -5829,6 +5850,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/LineMovesEnvelope"
+            }
+          }
+        }
+      },
+      "Problem": {
+        "description": "Request failed",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
             }
           }
         }
