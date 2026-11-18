@@ -473,7 +473,7 @@
                 {
                   "key": "snapshots",
                   "value": "opening,closing",
-                  "description": "Pro only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`.",
+                  "description": "Pro and above. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`.",
                   "disabled": true
                 }
               ],
@@ -641,7 +641,7 @@
                 }
               ]
             },
-            "description": "Pro only. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.\n\nReference: https://sockodds.com/docs/#listOddsHistory"
+            "description": "Pro and above. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.\n\nReference: https://sockodds.com/docs/#listOddsHistory"
           },
           "response": []
         }
@@ -757,7 +757,7 @@
                 }
               ]
             },
-            "description": "Pro only. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.\n\nReference: https://sockodds.com/docs/#listHistoryFiles"
+            "description": "Pro and above. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.\n\nReference: https://sockodds.com/docs/#listHistoryFiles"
           },
           "response": []
         },
@@ -795,7 +795,7 @@
                 }
               ]
             },
-            "description": "Pro only. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.\n\nReference: https://sockodds.com/docs/#getHistoryFile"
+            "description": "Pro and above. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.\n\nReference: https://sockodds.com/docs/#getHistoryFile"
           },
           "response": []
         }
@@ -1004,6 +1004,562 @@
         }
       ],
       "description": "Australian and New Zealand thoroughbred, harness and greyhound racing."
+    },
+    {
+      "name": "Opportunities",
+      "item": [
+        {
+          "name": "listArbitrage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/opportunities/arbs?league=nba&min_edge=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opportunities",
+                "arbs"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nba",
+                  "description": ""
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "min_edge",
+                  "value": "1",
+                  "description": "Lowest profit to list, in percent of the total stake."
+                },
+                {
+                  "key": "max_age",
+                  "value": "600",
+                  "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Arbitrage: two prices at two different bookmakers that cover both sides of one market, so backing both in the listed proportions returns a profit whichever side wins. Upcoming events only, best profit first, 25 a page by default, up to 100. The list is recomputed about every four minutes from the prices SockOdds records; each entry carries the time each price was observed, when the entry was computed and when it expires. By default an entry is listed only while both prices were observed in the last 600 seconds (`max_age`). Only bookmakers your key may read are used. Each entry counts as one object. Prices move: check the price at the bookmaker before acting on any entry.\n\nReference: https://sockodds.com/docs/#listArbitrage"
+          },
+          "response": []
+        },
+        {
+          "name": "listLowHolds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/opportunities/low-holds?league=nfl&max_hold=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opportunities",
+                "low-holds"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": ""
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "max_hold",
+                  "value": "1",
+                  "description": "Highest combined margin to list, in percent."
+                },
+                {
+                  "key": "max_age",
+                  "value": "600",
+                  "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Low holds: the best price on each side of one market at two different bookmakers, where the two together carry almost no margin. `hold_pct` is that combined margin in percent (0 is break-even). Lowest hold first. Filters, paging, freshness and metering are as for arbitrage; `bookmakers` keeps the entries whose two prices are both at the named bookmakers.\n\nReference: https://sockodds.com/docs/#listLowHolds"
+          },
+          "response": []
+        },
+        {
+          "name": "listMiddles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/opportunities/middles?league=nfl",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opportunities",
+                "middles"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": ""
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "min_edge",
+                  "value": "",
+                  "description": "Lowest middle profit to list, in percent of the total stake.",
+                  "disabled": true
+                },
+                {
+                  "key": "max_age",
+                  "value": "600",
+                  "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Middles: two bets on different lines of one market at two bookmakers (over 44.5 at one, under 47.5 at the other), so both win when the result lands in the gap. `gap` is the distance between the lines, `middle_profit_pct` the profit in percent of the total stake when both win, and `profit_pct` the result when only one wins (negative unless the pair is also an arbitrage). Largest middle profit first. `min_edge` is the lowest `middle_profit_pct` to list. Filters, paging, freshness and metering are as for arbitrage.\n\nReference: https://sockodds.com/docs/#listMiddles"
+          },
+          "response": []
+        },
+        {
+          "name": "listPositiveEv",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/opportunities/ev?league=nba&min_edge=3&fair=sharp_book",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opportunities",
+                "ev"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nba",
+                  "description": ""
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "min_edge",
+                  "value": "3",
+                  "description": "Lowest expected value to list, in percent."
+                },
+                {
+                  "key": "fair",
+                  "value": "sharp_book",
+                  "description": "Comma-separated fair-price methods to keep: `sharp_book`, `exchange`, `consensus`."
+                },
+                {
+                  "key": "max_age",
+                  "value": "600",
+                  "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Positive expected value: a bookmaker price longer than the fair price of the outcome. `fair` says how the fair price was made: `sharp_book` (one sharp bookmaker's two-sided market with its margin removed, named in `fair.bookmaker`), `exchange` (an exchange's back and lay prices) or `consensus` (the margin-free prices of `fair.books` other bookmakers, combined; never the bookmaker being priced). `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; freshness, paging and metering are as for arbitrage. An estimate, not a guarantee: a fair price is a model of the market, and prices move.\n\nReference: https://sockodds.com/docs/#listPositiveEv"
+          },
+          "response": []
+        }
+      ],
+      "description": "Arbitrage, low holds, middles and positive expected value, computed from the prices SockOdds records. Pro and above."
+    },
+    {
+      "name": "Analysis",
+      "item": [
+        {
+          "name": "listFairOdds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/fair-odds?league=nba&markets=winner,handicap,total_points&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fair-odds"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nba",
+                  "description": "Required."
+                },
+                {
+                  "key": "markets",
+                  "value": "winner,handicap,total_points",
+                  "description": "Comma-separated market keys, at most 20."
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "alternates",
+                  "value": "false",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "devig",
+                  "value": "proportional",
+                  "description": "How the margin is removed. `proportional` (the default) divides each implied probability by their sum. `power` raises each to the one exponent that makes them sum to 1, which takes more margin off long prices.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_before",
+                  "value": "2026-01-02T00:00:00Z",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Each event counts as one object.\n\nReference: https://sockodds.com/docs/#listFairOdds"
+          },
+          "response": []
+        },
+        {
+          "name": "getEventFairOdds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/:event_id/fair-odds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                ":event_id",
+                "fair-odds"
+              ],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "alternates",
+                  "value": "false",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "devig",
+                  "value": "proportional",
+                  "description": "How the margin is removed. `proportional` (the default) divides each implied probability by their sum. `power` raises each to the one exponent that makes them sum to 1, which takes more margin off long prices.",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Pro and above. Fair prices for one event, as `/fair-odds` describes them. `bookmakers` limits both the bookmakers a consensus is built from and the bookmakers `best_price` is chosen among.\n\nReference: https://sockodds.com/docs/#getEventFairOdds"
+          },
+          "response": []
+        },
+        {
+          "name": "getEventClosing",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/:event_id/closing",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                ":event_id",
+                "closing"
+              ],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "alternates",
+                  "value": "false",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "devig",
+                  "value": "proportional",
+                  "description": "How the margin is removed. `proportional` (the default) divides each implied probability by their sum. `power` raises each to the one exponent that makes them sum to 1, which takes more margin off long prices.",
+                  "disabled": true
+                },
+                {
+                  "key": "outcome_id",
+                  "value": "",
+                  "description": "The outcome you bet on. Give it with `odds`.",
+                  "disabled": true
+                },
+                {
+                  "key": "odds",
+                  "value": "",
+                  "description": "The decimal odds you took. Give it with `outcome_id`.",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Pro and above. The closing line of one event: each bookmaker's opening and closing price per outcome (as `snapshots=opening,closing` returns them), the fair closing price per outcome (`closing_fair`, built from the closing prices as `/fair-odds` builds a fair price) and `opening_clv_pct`, the closing line value of each bookmaker's opening price: how far that price beat the fair closing price, in percent (positive beat the close). Give `outcome_id` and `odds` together to get the closing line value of your own bet in `bet`. Without `markets` the main markets are read (winner, result, handicap and the game totals); name up to 20 market keys for others. Closing prices are null until the event has started. Counted like event odds: one object for the event plus one per bookmaker price.\n\nReference: https://sockodds.com/docs/#getEventClosing"
+          },
+          "response": []
+        },
+        {
+          "name": "listLineMoves",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/moves?league=nba&window=60&steam=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "moves"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nba",
+                  "description": "Required."
+                },
+                {
+                  "key": "window",
+                  "value": "60",
+                  "description": "Minutes to look back, in steps of 5."
+                },
+                {
+                  "key": "min_books",
+                  "value": "3",
+                  "description": "Fewest bookmakers that moved the same way.",
+                  "disabled": true
+                },
+                {
+                  "key": "steam",
+                  "value": "true",
+                  "description": "true lists only steam moves."
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Line moves in one league: markets whose main line (handicap, totals, player and team over/unders) changed at one or more bookmakers in the last `window` minutes, upcoming events only. Each bookmaker counts once, by its net move in the window (a line that moved and came back is not a move). `steam` is true when at least `min_books` bookmakers moved the same way and they are at least two thirds of the bookmakers that moved; `sharp` is true when Pinnacle is among them. `from_line` and `to_line` are the median line of those bookmakers before and after; for a handicap the line is the home side's (competitor 1 in tennis). Steam first, then the most bookmakers. Lines are sampled every few minutes, so a move is timed to the sample that first saw it. Markets with no line (head to head) are not covered. Each market counts as one object.\n\nReference: https://sockodds.com/docs/#listLineMoves"
+          },
+          "response": []
+        }
+      ],
+      "description": "Prices with the bookmaker margin removed, closing prices and closing line value, and line moves across bookmakers. Pro and above."
     }
   ]
 }

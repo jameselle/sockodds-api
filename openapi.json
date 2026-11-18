@@ -34,6 +34,14 @@
     {
       "name": "Racing",
       "description": "Australian and New Zealand thoroughbred, harness and greyhound racing."
+    },
+    {
+      "name": "Opportunities",
+      "description": "Arbitrage, low holds, middles and positive expected value, computed from the prices SockOdds records. Pro and above."
+    },
+    {
+      "name": "Analysis",
+      "description": "Prices with the bookmaker margin removed, closing prices and closing line value, and line moves across bookmakers. Pro and above."
     }
   ],
   "paths": {
@@ -331,7 +339,7 @@
                 "opening,closing"
               ]
             },
-            "description": "Pro only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`."
+            "description": "Pro and above. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`."
           }
         ],
         "responses": {
@@ -402,7 +410,7 @@
           "Prices"
         ],
         "operationId": "streamOdds",
-        "description": "Pro only. Upgrade to a WebSocket with your bearer key to receive the current prices for one event, or for up to 20 events in one league, every 15 seconds. Each message is a JSON object whose `type` is `snapshot` (the same body as the matching odds route, grouped by market unless `group_by=bookmaker`), `heartbeat` (nothing changed) or `error` (a problem object, after which the connection closes). A refresh counts towards your allowance like an ordinary odds request only when it sends a new snapshot; a heartbeat (nothing changed) is free. Every refresh still counts towards your per minute request limit. Up to two streams per key. A stream lasts at most one hour; reconnect for a fresh one. The stream is read only; a message from the client closes it. Close codes are 1000 (lifetime reached), 1008 (key, plan or limit change), 1009 (snapshot too large, narrow the filters), 1011 (refresh failed) and 1013 (client reading too slowly).",
+        "description": "Pro and above. Upgrade to a WebSocket with your bearer key to receive the current prices for one event, or for up to 20 events in one league, every 15 seconds. Each message is a JSON object whose `type` is `snapshot` (the same body as the matching odds route, grouped by market unless `group_by=bookmaker`), `heartbeat` (nothing changed) or `error` (a problem object, after which the connection closes). A refresh counts towards your allowance like an ordinary odds request only when it sends a new snapshot; a heartbeat (nothing changed) is free. Every refresh still counts towards your per minute request limit. Up to two streams per key. A stream lasts at most one hour; reconnect for a fresh one. The stream is read only; a message from the client closes it. Close codes are 1000 (lifetime reached), 1008 (key, plan or limit change), 1009 (snapshot too large, narrow the filters), 1011 (refresh failed) and 1013 (client reading too slowly).",
         "x-websocket": {
           "refresh_seconds": 15,
           "max_lifetime_seconds": 3600,
@@ -472,7 +480,7 @@
           "Prices"
         ],
         "operationId": "listOddsHistory",
-        "description": "Pro only. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.",
+        "description": "Pro and above. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.",
         "parameters": [
           {
             "in": "query",
@@ -536,7 +544,7 @@
           "History"
         ],
         "operationId": "listHistoryFiles",
-        "description": "Pro only. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.",
+        "description": "Pro and above. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.",
         "parameters": [
           {
             "$ref": "#/components/parameters/League"
@@ -564,7 +572,7 @@
           "History"
         ],
         "operationId": "getHistoryFile",
-        "description": "Pro only. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.",
+        "description": "Pro and above. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.",
         "parameters": [
           {
             "in": "path",
@@ -816,6 +824,419 @@
           }
         }
       }
+    },
+    "/opportunities/arbs": {
+      "get": {
+        "tags": [
+          "Opportunities"
+        ],
+        "operationId": "listArbitrage",
+        "description": "Pro and above. Arbitrage: two prices at two different bookmakers that cover both sides of one market, so backing both in the listed proportions returns a profit whichever side wins. Upcoming events only, best profit first, 25 a page by default, up to 100. The list is recomputed about every four minutes from the prices SockOdds records; each entry carries the time each price was observed, when the entry was computed and when it expires. By default an entry is listed only while both prices were observed in the last 600 seconds (`max_age`). Only bookmakers your key may read are used. Each entry counts as one object. Prices move: check the price at the bookmaker before acting on any entry.",
+        "x-example-query": "league=nba&min_edge=1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "in": "query",
+            "name": "min_edge",
+            "description": "Lowest profit to list, in percent of the total stake.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MaxAge"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PairOpportunities"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/opportunities/low-holds": {
+      "get": {
+        "tags": [
+          "Opportunities"
+        ],
+        "operationId": "listLowHolds",
+        "description": "Pro and above. Low holds: the best price on each side of one market at two different bookmakers, where the two together carry almost no margin. `hold_pct` is that combined margin in percent (0 is break-even). Lowest hold first. Filters, paging, freshness and metering are as for arbitrage; `bookmakers` keeps the entries whose two prices are both at the named bookmakers.",
+        "x-example-query": "league=nfl&max_hold=1",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "in": "query",
+            "name": "max_hold",
+            "description": "Highest combined margin to list, in percent.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MaxAge"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PairOpportunities"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/opportunities/middles": {
+      "get": {
+        "tags": [
+          "Opportunities"
+        ],
+        "operationId": "listMiddles",
+        "description": "Pro and above. Middles: two bets on different lines of one market at two bookmakers (over 44.5 at one, under 47.5 at the other), so both win when the result lands in the gap. `gap` is the distance between the lines, `middle_profit_pct` the profit in percent of the total stake when both win, and `profit_pct` the result when only one wins (negative unless the pair is also an arbitrage). Largest middle profit first. `min_edge` is the lowest `middle_profit_pct` to list. Filters, paging, freshness and metering are as for arbitrage.",
+        "x-example-query": "league=nfl",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "in": "query",
+            "name": "min_edge",
+            "description": "Lowest middle profit to list, in percent of the total stake.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MaxAge"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PairOpportunities"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/opportunities/ev": {
+      "get": {
+        "tags": [
+          "Opportunities"
+        ],
+        "operationId": "listPositiveEv",
+        "description": "Pro and above. Positive expected value: a bookmaker price longer than the fair price of the outcome. `fair` says how the fair price was made: `sharp_book` (one sharp bookmaker's two-sided market with its margin removed, named in `fair.bookmaker`), `exchange` (an exchange's back and lay prices) or `consensus` (the margin-free prices of `fair.books` other bookmakers, combined; never the bookmaker being priced). `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; freshness, paging and metering are as for arbitrage. An estimate, not a guarantee: a fair price is a model of the market, and prices move.",
+        "x-example-query": "league=nba&min_edge=3&fair=sharp_book",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "in": "query",
+            "name": "min_edge",
+            "description": "Lowest expected value to list, in percent.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "fair",
+            "description": "Comma-separated fair-price methods to keep: `sharp_book`, `exchange`, `consensus`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MaxAge"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EvOpportunities"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/fair-odds": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "operationId": "listFairOdds",
+        "description": "Pro and above. Fair prices for a league's events: each market's prices with the bookmaker margin removed. The base is Pinnacle's own two-sided (or three-way) market when Pinnacle prices every outcome of it (`fair.source` `sharp_book`); otherwise the median of every bookmaker that prices the whole market, each with its own margin removed, when at least three do (`consensus`). A market with neither base is left out, as are markets whose runners are players or scores. Each outcome carries its fair probability and fair decimal odds, and `best_price`: the best current price among the bookmakers your key may read, with its edge against the fair price. With no start window the list holds events that started at most 12 hours ago and upcoming ones, in start order, 25 a page at most. Main lines only unless `alternates=true`. Each event counts as one object.",
+        "x-example-query": "league=nba&markets=winner,handicap,total_points&limit=5",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "league",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Key"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/Devig"
+          },
+          {
+            "$ref": "#/components/parameters/StartsAfter"
+          },
+          {
+            "$ref": "#/components/parameters/StartsBefore"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FairOddsEvents"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events/{event_id}/fair-odds": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "operationId": "getEventFairOdds",
+        "description": "Pro and above. Fair prices for one event, as `/fair-odds` describes them. `bookmakers` limits both the bookmakers a consensus is built from and the bookmakers `best_price` is chosen among.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EventId"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/Devig"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FairOddsEvent"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events/{event_id}/closing": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "operationId": "getEventClosing",
+        "description": "Pro and above. The closing line of one event: each bookmaker's opening and closing price per outcome (as `snapshots=opening,closing` returns them), the fair closing price per outcome (`closing_fair`, built from the closing prices as `/fair-odds` builds a fair price) and `opening_clv_pct`, the closing line value of each bookmaker's opening price: how far that price beat the fair closing price, in percent (positive beat the close). Give `outcome_id` and `odds` together to get the closing line value of your own bet in `bet`. Without `markets` the main markets are read (winner, result, handicap and the game totals); name up to 20 market keys for others. Closing prices are null until the event has started. Counted like event odds: one object for the event plus one per bookmaker price.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EventId"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/Devig"
+          },
+          {
+            "in": "query",
+            "name": "outcome_id",
+            "description": "The outcome you bet on. Give it with `odds`.",
+            "schema": {
+              "$ref": "#/components/schemas/OutcomeId"
+            }
+          },
+          {
+            "in": "query",
+            "name": "odds",
+            "description": "The decimal odds you took. Give it with `outcome_id`.",
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ClosingEvent"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/moves": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "operationId": "listLineMoves",
+        "description": "Pro and above. Line moves in one league: markets whose main line (handicap, totals, player and team over/unders) changed at one or more bookmakers in the last `window` minutes, upcoming events only. Each bookmaker counts once, by its net move in the window (a line that moved and came back is not a move). `steam` is true when at least `min_books` bookmakers moved the same way and they are at least two thirds of the bookmakers that moved; `sharp` is true when Pinnacle is among them. `from_line` and `to_line` are the median line of those bookmakers before and after; for a handicap the line is the home side's (competitor 1 in tennis). Steam first, then the most bookmakers. Lines are sampled every few minutes, so a move is timed to the sample that first saw it. Markets with no line (head to head) are not covered. Each market counts as one object.",
+        "x-example-query": "league=nba&window=60&steam=true",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "league",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Key"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "description": "Minutes to look back, in steps of 5.",
+            "schema": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 360,
+              "default": 60,
+              "multipleOf": 5
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_books",
+            "description": "Fewest bookmakers that moved the same way.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 3
+            }
+          },
+          {
+            "in": "query",
+            "name": "steam",
+            "description": "true lists only steam moves.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LineMoves"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -965,6 +1386,30 @@
         "required": true,
         "schema": {
           "$ref": "#/components/schemas/RaceId"
+        }
+      },
+      "MaxAge": {
+        "in": "query",
+        "name": "max_age",
+        "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+        "schema": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 2700,
+          "default": 600
+        }
+      },
+      "Devig": {
+        "in": "query",
+        "name": "devig",
+        "description": "How the margin is removed. `proportional` (the default) divides each implied probability by their sum. `power` raises each to the one exponent that makes them sum to 1, which takes more margin off long prices.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "proportional",
+            "power"
+          ],
+          "default": "proportional"
         }
       }
     },
@@ -3423,6 +3868,1073 @@
             "$ref": "#/components/schemas/Links"
           }
         }
+      },
+      "OpportunityEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "league",
+          "scheduled_start"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/EventId"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "league": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "MarketSubject": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/PlayerId"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "OpportunityLeg": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One of the two bets of a pair.",
+        "required": [
+          "market_id",
+          "outcome_id",
+          "side",
+          "line",
+          "bookmaker",
+          "bookmaker_name",
+          "decimal_odds",
+          "implied_probability",
+          "stake_pct",
+          "observed_at"
+        ],
+        "properties": {
+          "market_id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "outcome_id": {
+            "$ref": "#/components/schemas/OutcomeId"
+          },
+          "side": {
+            "type": "string",
+            "description": "A catalogue side key (over, under, home, away, yes, no ...)."
+          },
+          "line": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The outcome's own line. Null when the market has no line."
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "bookmaker_name": {
+            "type": "string"
+          },
+          "decimal_odds": {
+            "type": "number",
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "stake_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Share of the total stake to place on this leg, in percent, so both results return the same. Null on a middle."
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When this price was observed at the bookmaker."
+          }
+        }
+      },
+      "PairOpportunity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "event",
+          "market",
+          "legs",
+          "implied_sum",
+          "price_age_seconds",
+          "computed_at",
+          "expires_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^op_[0-9a-f]{16}$",
+            "description": "Stable while the two prices do not change."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "arbitrage",
+              "low_hold",
+              "middle"
+            ]
+          },
+          "event": {
+            "$ref": "#/components/schemas/OpportunityEvent"
+          },
+          "market": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "name",
+              "period",
+              "subject"
+            ],
+            "properties": {
+              "key": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "name": {
+                "type": "string"
+              },
+              "period": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "subject": {
+                "$ref": "#/components/schemas/MarketSubject"
+              }
+            }
+          },
+          "legs": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/OpportunityLeg"
+            }
+          },
+          "implied_sum": {
+            "type": "number",
+            "description": "The two implied probabilities added. Below 1 is an arbitrage."
+          },
+          "profit_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Arbitrage and middles: profit in percent of the total stake when one leg wins. Negative on a middle that is not also an arbitrage."
+          },
+          "hold_pct": {
+            "type": "number",
+            "description": "Low holds: the combined margin of the two prices, in percent."
+          },
+          "gap": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Middles: the distance between the two lines."
+          },
+          "middle_profit_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Middles: profit in percent of the total stake when both legs win."
+          },
+          "price_age_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Age of the older of the two prices when the response was built."
+          },
+          "computed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "The entry is dropped at this time unless a later pass finds it again."
+          }
+        }
+      },
+      "EvOpportunity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "event",
+          "market",
+          "outcome",
+          "bookmaker",
+          "bookmaker_name",
+          "decimal_odds",
+          "implied_probability",
+          "fair",
+          "ev_pct",
+          "kelly_pct",
+          "observed_at",
+          "price_age_seconds",
+          "computed_at",
+          "expires_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^op_[0-9a-f]{16}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "positive_ev"
+            ]
+          },
+          "event": {
+            "$ref": "#/components/schemas/OpportunityEvent"
+          },
+          "market": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "key",
+              "name",
+              "period",
+              "subject"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/MarketId"
+              },
+              "key": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "name": {
+                "type": "string"
+              },
+              "period": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "subject": {
+                "$ref": "#/components/schemas/MarketSubject"
+              }
+            }
+          },
+          "outcome": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "side",
+              "line"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/OutcomeId"
+              },
+              "side": {
+                "type": "string"
+              },
+              "line": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "bookmaker_name": {
+            "type": "string"
+          },
+          "decimal_odds": {
+            "type": "number",
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "fair": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "probability",
+              "decimal_odds",
+              "method",
+              "bookmaker",
+              "devig",
+              "books"
+            ],
+            "properties": {
+              "probability": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "decimal_odds": {
+                "type": "number",
+                "exclusiveMinimum": 1
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "sharp_book",
+                  "exchange",
+                  "consensus"
+                ]
+              },
+              "bookmaker": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Key"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "The bookmaker or exchange the fair price comes from. Null for a consensus."
+              },
+              "devig": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "power",
+                  "proportional",
+                  "shin",
+                  null
+                ],
+                "description": "Consensus only: how each bookmaker's margin was removed."
+              },
+              "books": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "How many bookmakers the fair price was built from."
+              }
+            }
+          },
+          "ev_pct": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Expected profit in percent of the stake."
+          },
+          "kelly_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Full-Kelly stake in percent of bankroll."
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "price_age_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "computed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "FairBase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "bookmaker",
+          "devig",
+          "books",
+          "overround"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "sharp_book",
+              "consensus"
+            ]
+          },
+          "bookmaker": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Key"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The sharp bookmaker. Null for a consensus."
+          },
+          "devig": {
+            "type": "string",
+            "enum": [
+              "proportional",
+              "power"
+            ]
+          },
+          "books": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "overround": {
+            "type": "number",
+            "description": "The implied probabilities of the base added: the sharp bookmaker's own, or the median across the consensus bookmakers. 1.03 is a 3 percent margin."
+          }
+        }
+      },
+      "FairMarket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "period",
+          "subject",
+          "alternate",
+          "fair",
+          "outcomes"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/MarketSubject"
+          },
+          "alternate": {
+            "type": "boolean"
+          },
+          "fair": {
+            "$ref": "#/components/schemas/FairBase"
+          },
+          "outcomes": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "side",
+                "line",
+                "fair_probability",
+                "fair_decimal_odds",
+                "best_price"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/OutcomeId"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "side": {
+                  "type": "string"
+                },
+                "line": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "fair_probability": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "exclusiveMaximum": 1
+                },
+                "fair_decimal_odds": {
+                  "type": "number",
+                  "exclusiveMinimum": 1
+                },
+                "best_price": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "bookmaker",
+                        "decimal_odds",
+                        "ev_pct",
+                        "observed_at"
+                      ],
+                      "properties": {
+                        "bookmaker": {
+                          "$ref": "#/components/schemas/Key"
+                        },
+                        "decimal_odds": {
+                          "type": "number",
+                          "exclusiveMinimum": 1
+                        },
+                        "ev_pct": {
+                          "type": "number",
+                          "description": "Edge of this price against the fair price, in percent. Negative when the best price is shorter than fair."
+                        },
+                        "observed_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "FairOddsEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Event"
+          },
+          {
+            "type": "object",
+            "required": [
+              "markets"
+            ],
+            "properties": {
+              "markets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FairMarket"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ClosingMarket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "period",
+          "subject",
+          "alternate",
+          "closing_fair",
+          "outcomes"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/MarketSubject"
+          },
+          "alternate": {
+            "type": "boolean"
+          },
+          "closing_fair": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FairBase"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How the fair closing price was built. Null when no bookmaker closed the whole market (or before the event starts)."
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "side",
+                "line",
+                "closing_fair_probability",
+                "closing_fair_decimal_odds",
+                "prices"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/OutcomeId"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "side": {
+                  "type": "string"
+                },
+                "line": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "closing_fair_probability": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "closing_fair_decimal_odds": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "prices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "bookmaker",
+                      "opening",
+                      "closing",
+                      "opening_clv_pct"
+                    ],
+                    "properties": {
+                      "bookmaker": {
+                        "$ref": "#/components/schemas/Key"
+                      },
+                      "opening": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/PriceSnapshot"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "closing": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/PriceSnapshot"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "opening_clv_pct": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "description": "Closing line value of this bookmaker's opening price against the fair closing price, in percent. Positive beat the close."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ClosingEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Event"
+          },
+          {
+            "type": "object",
+            "required": [
+              "markets"
+            ],
+            "properties": {
+              "markets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ClosingMarket"
+                }
+              },
+              "bet": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Present when outcome_id and odds are given.",
+                "required": [
+                  "outcome_id",
+                  "decimal_odds",
+                  "closing_fair_decimal_odds",
+                  "clv_pct",
+                  "beat_close"
+                ],
+                "properties": {
+                  "outcome_id": {
+                    "$ref": "#/components/schemas/OutcomeId"
+                  },
+                  "decimal_odds": {
+                    "type": "number",
+                    "exclusiveMinimum": 1
+                  },
+                  "closing_fair_decimal_odds": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "clv_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "Your odds against the fair closing price, in percent. Null until there is a fair closing price."
+                  },
+                  "beat_close": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LineMove": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "event",
+          "market",
+          "direction",
+          "steam",
+          "sharp",
+          "books_moved",
+          "books_up",
+          "books_down",
+          "from_line",
+          "to_line",
+          "first_move_at",
+          "last_move_at",
+          "moves"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^mv_[0-9a-f]{16}$"
+          },
+          "event": {
+            "$ref": "#/components/schemas/OpportunityEvent"
+          },
+          "market": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "name",
+              "period",
+              "subject"
+            ],
+            "properties": {
+              "key": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "name": {
+                "type": "string"
+              },
+              "period": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "subject": {
+                "$ref": "#/components/schemas/MarketSubject"
+              }
+            }
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "mixed"
+            ],
+            "description": "Which way most bookmakers moved the line."
+          },
+          "steam": {
+            "type": "boolean"
+          },
+          "sharp": {
+            "type": "boolean",
+            "description": "True when Pinnacle is among the bookmakers that moved with the majority."
+          },
+          "books_moved": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "books_up": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "books_down": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "from_line": {
+            "type": "number",
+            "description": "Median line of the majority before their move."
+          },
+          "to_line": {
+            "type": "number",
+            "description": "Median line of the majority after it."
+          },
+          "first_move_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_move_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "moves": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "bookmaker",
+                "from_line",
+                "to_line",
+                "observed_at"
+              ],
+              "properties": {
+                "bookmaker": {
+                  "$ref": "#/components/schemas/Key"
+                },
+                "from_line": {
+                  "type": "number"
+                },
+                "to_line": {
+                  "type": "number"
+                },
+                "observed_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the bookmaker's latest line in the window was first seen."
+                }
+              }
+            }
+          }
+        }
+      },
+      "PairOpportunitiesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PairOpportunity"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EvOpportunitiesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvOpportunity"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "FairOddsEventsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FairOddsEvent"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "FairOddsEventEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FairOddsEvent"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "ClosingEventEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ClosingEvent"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "LineMovesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LineMove"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
       }
     },
     "responses": {
@@ -3528,7 +5040,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "$ref": "#/components/schemas/OddsEventsEnvelope"
                 },
@@ -3545,7 +5057,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "$ref": "#/components/schemas/OddsEventEnvelope"
                 },
@@ -3633,6 +5145,66 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/RaceHistoryEnvelope"
+            }
+          }
+        }
+      },
+      "PairOpportunities": {
+        "description": "Arbitrage, low holds or middles",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PairOpportunitiesEnvelope"
+            }
+          }
+        }
+      },
+      "EvOpportunities": {
+        "description": "Positive expected value",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EvOpportunitiesEnvelope"
+            }
+          }
+        }
+      },
+      "FairOddsEvents": {
+        "description": "Fair prices by event",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FairOddsEventsEnvelope"
+            }
+          }
+        }
+      },
+      "FairOddsEvent": {
+        "description": "Fair prices of one event",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FairOddsEventEnvelope"
+            }
+          }
+        }
+      },
+      "ClosingEvent": {
+        "description": "Opening and closing prices with closing line value",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ClosingEventEnvelope"
+            }
+          }
+        }
+      },
+      "LineMoves": {
+        "description": "Line moves",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LineMovesEnvelope"
             }
           }
         }

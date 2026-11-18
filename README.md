@@ -30,6 +30,7 @@ One REST API returns bookmaker prices that SockOdds records itself, with readabl
 - **Results graded from official sources.** Each outcome gets a verdict: `won`, `lost`, `void`, `dead_heat` (with its factor) or, on Asian quarter lines, `half_won` and `half_lost`. Outcomes that official evidence cannot settle are left out, never guessed. See [results](https://sockodds.com/docs/results/).
 - **Player market rules.** Player prices say how that bookmaker settles a player who takes no part (`void`, `loses`, `under` or `fair_price`), so you can filter to the ones you want.
 - **A WebSocket stream** of current prices for an event or a league, on paid plans. See [streaming](https://sockodds.com/docs/streaming/).
+- **Arbitrage, middles, +EV, fair odds and line moves** computed from the recorded prices: arbitrage and low-hold pairs, middles, prices above the fair price, de-margined fair odds (Pinnacle, else a consensus of bookmakers), opening and closing prices with closing line value, and line moves and steam across bookmakers, on Pro and above. See [opportunities](https://sockodds.com/docs/opportunities/) and [fair odds](https://sockodds.com/docs/fair-odds/).
 - **Australian and New Zealand racing**: race cards, win and place prices by bookmaker, exchange back and lay, and price movement. See [racing](https://sockodds.com/docs/racing/).
 - **Plain HTTP that is easy to build on.** Bearer key auth, `{data, meta, links}` envelopes, cursor pagination through `links.next`, and errors as `application/problem+json`.
 
@@ -144,7 +145,7 @@ See [examples/README.md](examples/README.md) for arguments and sample output.
 
 ## Postman
 
-[`sockodds-api-v1.postman_collection.json`](sockodds-api-v1.postman_collection.json) has one request for every HTTP operation, in folders by tag (Catalogue, Identity, Prices, Results, History, Racing). It is generated from `openapi.json` by [`scripts/generate_postman.py`](scripts/generate_postman.py).
+[`sockodds-api-v1.postman_collection.json`](sockodds-api-v1.postman_collection.json) has one request for every HTTP operation, in folders by tag (Catalogue, Identity, Prices, Results, History, Racing, Opportunities, Analysis). It is generated from `openapi.json` by [`scripts/generate_postman.py`](scripts/generate_postman.py).
 
 1. In Postman choose **Import** and drop in the file (or paste `https://sockodds.com/postman.json`).
 2. Open the collection's **Variables** tab. `baseUrl` is filled in. Put your key in `sockoddsKey` as the **current value** only, so it is never shared or exported.
