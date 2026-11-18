@@ -33,7 +33,7 @@
     },
     {
       "name": "Racing",
-      "description": "Australian and New Zealand thoroughbred, harness and greyhound racing."
+      "description": "Australian and New Zealand thoroughbred, harness and greyhound racing: meetings and fields, fixed-odds and exchange prices, tote pools and dividends, results, Betfair Starting Price, movement, movers, arbs, form and strike rates."
     },
     {
       "name": "Opportunities",
@@ -718,7 +718,7 @@
           "Racing"
         ],
         "operationId": "getRace",
-        "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer and whether it is scratched. `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null.",
+        "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer, weight, claim, form figures, silk colours and whether it is scratched or an emergency; and the race's class and conditions, prize money, track condition, weather, rail position and places paid, as stated on the TAB race page (null until that page has been read). `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null; the full result with dividends is at `/racing/races/{race_id}/result`.",
         "parameters": [
           {
             "$ref": "#/components/parameters/RaceId"
@@ -818,6 +818,504 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/RaceHistory"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/meetings": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listMeetings",
+        "description": "Race meetings: one racing code at one track on one day, each with its races in start order and the track condition, weather and rail position last stated for it. Same plans, filters and window as the races list (6 hours ago to 48 hours ahead by default, at most 8 days). A meeting id is its races' id without the race number, such as `thoroughbred_2026-11-17_AUS_scone`. Each meeting counts as one object.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "description": "Comma-separated racing codes: `thoroughbred`, `harness`, `greyhound`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_after",
+            "description": "UTC date and time. Defaults to 6 hours ago.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "description": "UTC date and time. At most 8 days after starts_after.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/results": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listRaceResults",
+        "description": "Resulted races in start order, each with its placings (runner number, position, name, and the TAB fixed and tote prices the placegetters paid), scratchings with their deductions, tote pool totals and tote dividends (win, place, quinella, exacta, trifecta, first four and the multi-race pools TAB declared). With no window the list covers the last 24 hours; a window may span at most 8 days. Results exist from 1 August 2026; dividends and prices paid come with them where the TAB result page was recorded. Each race counts as one object.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "description": "Comma-separated racing codes: `thoroughbred`, `harness`, `greyhound`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_after",
+            "description": "UTC date and time. Defaults to 24 hours ago.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "description": "UTC date and time. Defaults to now. At most 8 days after starts_after.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/result": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRaceResult",
+        "description": "The full result of one race: placings with the prices paid (TAB fixed win and place, tote win and place, and Betfair Starting Price), scratchings with deductions, tote pools and dividends, and `betfair_sp`: the Betfair Starting Price of every runner for win and place with the pre-play and in-play traded range and volume (AUD), from Betfair's published BSP files (Australian races; they arrive the day after the race). `result` is null until the race is resulted. Positions are the placegetters' (first four).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/tote": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRaceTote",
+        "description": "TAB tote pools for one race: the total in each pool (AUD), each runner's tote win and place dividend, and, once the race is resulted, the declared dividends by pool. `stage` is `approximate` while betting is open (the dividends move with the pool until it closes) and `final` after the result; null when the pools have not been read yet. Read about every 20 minutes in the three hours before a race and every minute in the last 15.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/movers": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listRaceMovers",
+        "description": "Pro only. Market movers across races still to run: for each runner the opening win price (the first price any bookmaker showed, and who) against the median and the best current fixed-odds win price, largest move first. `change` is (median now - opening) / opening: negative is firming, positive is drifting. Only prices observed in the last 600 seconds count, Betfair Exchange is not part of the median, and a runner whose opening price came from a bookmaker outside your request is left out. Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "description": "Comma-separated racing codes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "description": "UTC date and time within the next 24 hours. Defaults to 3 hours ahead.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "in": "query",
+            "name": "min_change",
+            "description": "Smallest move to list, as a fraction of the opening price.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "default": 0.1
+            }
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "any",
+                "firming",
+                "drifting"
+              ],
+              "default": "any"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/arbs": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listRaceArbs",
+        "description": "Pro only. Racing arbs on the win market in races still to run: the best fixed-odds win price at a bookmaker against the Betfair Exchange win lay price, where backing at the bookmaker and laying on the exchange returns a profit whichever way the race goes. `margin` = back x (1 - commission) / (lay - commission) - 1, the profit per unit staked on the back bet; `lay_stake_per_unit` = back / (lay - commission). `commission` is the exchange commission you pay (0.05 unless you pass yours; `meta.commission` echoes it). Both prices were observed in the last 600 seconds; `lay.size` is the AUD available at the lay price, so check it covers your lay stake, and check both prices before betting. Place markets are not compared (place terms differ between a bookmaker and the exchange). Looks at races from now to `starts_before` (3 hours ahead by default, 24 at most). Answers are reused for 20 seconds.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "description": "Comma-separated racing codes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "description": "UTC date and time within the next 24 hours. Defaults to 3 hours ahead.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "in": "query",
+            "name": "commission",
+            "description": "Exchange commission as a fraction.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.2,
+              "default": 0.05
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_margin",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/form": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRaceForm",
+        "description": "Form for every runner of a race: `form_figures` (the last-starts figures shown on the TAB race page, newest last) and `starts`, the runner's last starts before this race that SockOdds recorded, newest first: date, meeting, distance, class, track condition, jockey, trainer, barrier, weight, finishing position, field size and the prices it started at (TAB fixed, tote, Betfair SP). Recorded starts begin on 1 August 2026 (`meta.recorded_from`), so a runner's earlier career is not listed. `position` is 1 to 4 for a placegetter and null for a runner that finished further back. Runners are matched by name within a racing code.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Starts per runner.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/runners/form": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRunnerForm",
+        "description": "One runner's recorded starts, newest first, by racing code and name (case, punctuation and a country suffix such as (NZ) are ignored). The same fields as a race's form. Recorded starts begin on 1 August 2026.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "thoroughbred",
+                "harness",
+                "greyhound"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "description": "The runner's name.",
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/connections": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRaceConnections",
+        "description": "Strike rates for each runner's jockey (the driver in harness), trainer and the jockey and trainer together, over the `days` before the race: starts, wins, seconds, thirds, `win_rate` (wins / starts) and `place_rate` (first three / starts). Counted only from races SockOdds recorded (from 1 August 2026) in the same racing code, so they are rates over that record, not career figures. Greyhounds have a trainer only.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 730,
+              "default": 365
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/connections": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getConnectionStats",
+        "description": "Strike rates for one jockey (or driver), one trainer, or the two together, by name within a racing code, over the last `days` days of recorded races: starts, wins, seconds, thirds, win and place rate, and the first and last recorded start. Give `jockey`, `trainer` or both.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "thoroughbred",
+                "harness",
+                "greyhound"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jockey",
+            "description": "Jockey or driver name.",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
+            "name": "trainer",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 730,
+              "default": 365
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RacingData"
           },
           "default": {
             "$ref": "#/components/responses/Problem"
@@ -3410,6 +3908,27 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "class_conditions": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Class and conditions as TAB states them, such as `3YO+ MDN`. Null until the TAB race page has been read."
+          },
+          "prize_money": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Total prize money, AUD."
+          },
+          "track_condition": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Track rating as stated, such as `GOOD4` or `SOFT6`."
           }
         }
       },
@@ -3456,6 +3975,37 @@
             ]
           },
           "scratched": {
+            "type": "boolean"
+          },
+          "silk": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The silk colours in words."
+          },
+          "weight_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Allotted weight (thoroughbreds)."
+          },
+          "claim_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Apprentice claim."
+          },
+          "form_figures": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Last-starts figures as shown on the TAB race page, newest last (`x` is a spell)."
+          },
+          "emergency": {
             "type": "boolean"
           }
         }
@@ -3515,6 +4065,25 @@
               "result"
             ],
             "properties": {
+              "weather": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rail_position": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "places_paid": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "Places the tote pays."
+              },
               "runners": {
                 "type": "array",
                 "items": {
@@ -3822,6 +4391,51 @@
           },
           "meta": {
             "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "RacingEnvelope": {
+        "type": "object",
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            ]
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "count",
+              "cursor"
+            ],
+            "properties": {
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
           },
           "links": {
             "$ref": "#/components/schemas/Links"
@@ -5145,6 +5759,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/RaceHistoryEnvelope"
+            }
+          }
+        }
+      },
+      "RacingData": {
+        "description": "Racing data in the usual `{data, meta, links}` envelope. The fields are described on the operation and shown, with invented sample values, in the racing guide.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RacingEnvelope"
             }
           }
         }
