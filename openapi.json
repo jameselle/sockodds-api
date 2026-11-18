@@ -1,0 +1,3642 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SockOdds API",
+    "version": "1.0.0",
+    "description": "Bookmaker prices SockOdds records itself, readable identifiers, recorded price history and graded results for Australian and global sport."
+  },
+  "servers": [
+    {
+      "url": "https://api.sockodds.com/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Catalogue"
+    },
+    {
+      "name": "Identity"
+    },
+    {
+      "name": "Prices"
+    },
+    {
+      "name": "Results"
+    },
+    {
+      "name": "History"
+    },
+    {
+      "name": "Racing",
+      "description": "Australian and New Zealand thoroughbred, harness and greyhound racing."
+    }
+  ],
+  "paths": {
+    "/sports": {
+      "get": {
+        "tags": [
+          "Catalogue"
+        ],
+        "operationId": "listSports",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Sports"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/leagues": {
+      "get": {
+        "tags": [
+          "Catalogue"
+        ],
+        "operationId": "listLeagues",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Sport"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Leagues"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/bookmakers": {
+      "get": {
+        "tags": [
+          "Catalogue"
+        ],
+        "operationId": "listBookmakers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Regions"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Bookmakers"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/markets": {
+      "get": {
+        "tags": [
+          "Catalogue"
+        ],
+        "operationId": "listMarkets",
+        "description": "Markets and the sides each offers. With `league`, only the markets offered in that league's sport, and only the role sides that sport uses (winner and handicap are home and away in team sports, competitor_1 and competitor_2 in tennis; winner is also offered in UFC).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Markets"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/teams": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "operationId": "listTeams",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Teams"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/players": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "operationId": "listPlayers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/Team"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Players"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "operationId": "listEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/EventsStartsAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EventsStartsBefore"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Events"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events/lookup": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "operationId": "lookupEvents",
+        "description": "Find our event from an official event id: ESPN's event id, the AFL's match id (`CD_M` and digits) for AFLW, or the NRL's match id (digits) for the Rugby League World Cup. Send `ref` for one event, or `refs` for up to 100 at once. With `ref`, the response is the event, or 404 when no event carries that id. With `refs`, the response lists the ids that matched, in the order sent, each with its event; ids that match nothing are left out. A merged event returns the event it was merged into. Only official sources can be looked up, never a bookmaker's listing id. Each event returned counts as one object towards your allowance, like an event read.",
+        "x-example-query": "source=espn&ref=401000001",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": true,
+            "description": "Who issued the id: `espn`, `afl` for AFLW match ids, or `nrl` for Rugby League World Cup match ids.",
+            "schema": {
+              "$ref": "#/components/schemas/OfficialSource"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref",
+            "description": "One official event id. Use this or `refs`, not both.",
+            "schema": {
+              "$ref": "#/components/schemas/OfficialRef"
+            }
+          },
+          {
+            "in": "query",
+            "name": "refs",
+            "description": "Comma-separated official event ids, at most 100. Use this or `ref`, not both.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EventLookup"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events/{event_id}": {
+      "get": {
+        "tags": [
+          "Identity"
+        ],
+        "operationId": "getEvent",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EventId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Event"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/events/{event_id}/odds": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "operationId": "getEventOdds",
+        "description": "Current prices for one event, grouped by market: each market and outcome appears once, and each outcome lists every bookmaker's price in `prices`, best price first. Markets come in catalogue order, then period, subject and line; outcomes in the market's side order. Use `group_by=bookmaker` for one block per bookmaker instead (the shape v1 launched with). Each price counts as one object towards your allowance, plus one for the event, in either shape.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EventId"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Regions"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/GroupBy"
+          },
+          {
+            "$ref": "#/components/parameters/NonParticipantFilter"
+          },
+          {
+            "in": "query",
+            "name": "snapshots",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "opening",
+                "closing",
+                "opening,closing"
+              ]
+            },
+            "description": "Pro only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OddsEvent"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/odds": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "operationId": "listOdds",
+        "description": "Current prices for a page of events (25 by default, up to 100), grouped by market as on /events/{event_id}/odds unless `group_by=bookmaker`. Pages follow events; a cursor works only with the filters and grouping it was issued for, so follow `links.next`. Filters apply to prices before grouping: an outcome or market with no matching price is left out, and an event with none has an empty `markets` list. Each price counts as one object towards your allowance, plus one per event.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Regions"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/EventsStartsAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EventsStartsBefore"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/GroupBy"
+          },
+          {
+            "$ref": "#/components/parameters/NonParticipantFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OddsEvents"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/stream/odds": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "operationId": "streamOdds",
+        "description": "Pro only. Upgrade to a WebSocket with your bearer key to receive the current prices for one event, or for up to 20 events in one league, every 15 seconds. Each message is a JSON object whose `type` is `snapshot` (the same body as the matching odds route, grouped by market unless `group_by=bookmaker`), `heartbeat` (nothing changed) or `error` (a problem object, after which the connection closes). A refresh counts towards your allowance like an ordinary odds request only when it sends a new snapshot; a heartbeat (nothing changed) is free. Every refresh still counts towards your per minute request limit. Up to two streams per key. A stream lasts at most one hour; reconnect for a fresh one. The stream is read only; a message from the client closes it. Close codes are 1000 (lifetime reached), 1008 (key, plan or limit change), 1009 (snapshot too large, narrow the filters), 1011 (refresh failed) and 1013 (client reading too slowly).",
+        "x-websocket": {
+          "refresh_seconds": 15,
+          "max_lifetime_seconds": 3600,
+          "max_snapshot_bytes": 8000000,
+          "max_buffered_bytes": 1000000,
+          "max_streams_per_key": 2,
+          "max_league_limit": 20
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "event_id",
+            "description": "One event. Use this or `league`, not both.",
+            "schema": {
+              "$ref": "#/components/schemas/EventId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Regions"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Alternates"
+          },
+          {
+            "$ref": "#/components/parameters/GroupBy"
+          },
+          {
+            "$ref": "#/components/parameters/NonParticipantFilter"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "With `league` only. Events per snapshot, 1 to 20. Defaults to 10.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching to WebSocket."
+          },
+          "426": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/odds/history": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "operationId": "listOddsHistory",
+        "description": "Pro only. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/EventId"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 250
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/History"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/history/files": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "listHistoryFiles",
+        "description": "Pro only. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HistoryFiles"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/history/files/{league}/{day}": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "getHistoryFile",
+        "description": "Pro only. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "league",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Key"
+            }
+          },
+          {
+            "in": "path",
+            "name": "day",
+            "required": true,
+            "description": "UTC day as YYYY-MM-DD.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Parquet file",
+            "content": {
+              "application/vnd.apache.parquet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/results": {
+      "get": {
+        "tags": [
+          "Results"
+        ],
+        "operationId": "listResults",
+        "description": "Settled outcomes for finished events, graded from official result sources. Each outcome's `verdict` is `won`, `lost`, `void` (stake returned), `dead_heat`, `half_won` or `half_lost`. `half_won` / `half_lost` settle an Asian quarter line (x.25 / x.75) whose two half stakes split: one half won (or lost) at the quoted price and the other half refunded. A dead heat pays `dead_heat_factor` of the stake at the quoted price and loses the rest: a drawn AFL or AFLW head-to-head, a drawn AFLW quarter or half winner, a tied NBL quarter or half winner, and a Rugby League World Cup head-to-head still level after golden point, is a dead heat with a factor of 0.5. Outcomes that official evidence cannot settle are left out, never guessed. Each market settles on its own once official evidence settles all of its outcomes, so a result can be published while other markets on the event are still pending: `settlement` is `partial` and `pending_markets` counts them, and later results for the same event add the newly settled outcomes without changing any verdict already published. Each result also carries `box_score`: the official statistics the result is graded from (score by period, event and team totals, the player statistics SockOdds grades by player ID, and any athletes the source lists that the player registry cannot identify), or null until they have been read.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "in": "query",
+            "name": "event_id",
+            "description": "Restrict results to one independent event identity.",
+            "schema": {
+              "$ref": "#/components/schemas/EventId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/StartsAfter"
+          },
+          {
+            "$ref": "#/components/parameters/StartsBefore"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Results"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listRaces",
+        "description": "Australian and New Zealand races: thoroughbred, harness and greyhound. Rookie and Pro (and the Pro trial); Developer keys get 403. Races come in start order, 25 a page by default, up to 100. With neither starts_after nor starts_before the list runs from 6 hours ago to 48 hours ahead; a window may span at most 8 days. Each race counts as one object. Race ids are SockOdds racing ids such as `thoroughbred_2026-11-17_AUS_scone_r1` (code, date, country, meeting, race number), not the `ev_` ids sport uses.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "description": "Comma-separated racing codes: `thoroughbred`, `harness`, `greyhound`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_after",
+            "description": "UTC date and time. Defaults to 6 hours ago.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starts_before",
+            "description": "UTC date and time. Defaults to 48 hours after starts_after. At most 8 days after starts_after.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Races"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRace",
+        "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer and whether it is scratched. `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Race"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/odds": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "getRaceOdds",
+        "description": "Current fixed-odds win and place prices for every runner, one entry per bookmaker, and Betfair Exchange back and lay prices with the size available and the volume matched (AUD). `available` is true while the race has not jumped and the price was observed in the last 600 seconds. Scratched runners carry no prices. Rookie sees the bookmakers its plan names. The race counts as one object.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "in": "query",
+            "name": "snapshots",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "opening",
+                "closing",
+                "opening,closing"
+              ]
+            },
+            "description": "Pro only. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped."
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RaceOdds"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/racing/races/{race_id}/history": {
+      "get": {
+        "tags": [
+          "Racing"
+        ],
+        "operationId": "listRaceHistory",
+        "description": "Pro only. Every recorded change of a win or place price for one race, by runner and bookmaker, in observation order. A window may span at most 24 hours; racing movement is recorded from 16 November 2026 23:09 UTC. At most `limit` changes are returned; `meta.truncated` is true when the window may hold more, so ask again from the last `observed_at`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RaceId"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5000,
+              "default": 1000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RaceHistory"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerKey": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "parameters": {
+      "EventId": {
+        "in": "path",
+        "name": "event_id",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/EventId"
+        }
+      },
+      "League": {
+        "in": "query",
+        "name": "league",
+        "schema": {
+          "$ref": "#/components/schemas/Key"
+        }
+      },
+      "Sport": {
+        "in": "query",
+        "name": "sport",
+        "schema": {
+          "$ref": "#/components/schemas/Key"
+        }
+      },
+      "Team": {
+        "in": "query",
+        "name": "team",
+        "schema": {
+          "$ref": "#/components/schemas/Key"
+        }
+      },
+      "MarketsFilter": {
+        "in": "query",
+        "name": "markets",
+        "description": "Comma-separated market keys, at most 20.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Regions": {
+        "in": "query",
+        "name": "regions",
+        "description": "Comma-separated bookmaker regions, at most 20.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "BookmakersFilter": {
+        "in": "query",
+        "name": "bookmakers",
+        "description": "Comma-separated bookmaker keys, at most 20.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "StartsAfter": {
+        "in": "query",
+        "name": "starts_after",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "StartsBefore": {
+        "in": "query",
+        "name": "starts_before",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "EventsStartsAfter": {
+        "in": "query",
+        "name": "starts_after",
+        "description": "UTC date and time. With neither starts_after nor starts_before, the list starts 48 hours ago (live and upcoming games plus the last two days), and international cricket Tests (league cricket) are listed for six days from their start; name a window to list older games.",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "EventsStartsBefore": {
+        "in": "query",
+        "name": "starts_before",
+        "description": "UTC date and time. Give starts_after, starts_before or both to list games outside the default window (from 48 hours ago; six days for cricket Tests).",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "Alternates": {
+        "in": "query",
+        "name": "alternates",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "GroupBy": {
+        "in": "query",
+        "name": "group_by",
+        "description": "How prices are grouped. `market` (the default) lists each market and outcome once, with every bookmaker's price under the outcome in `prices`, best price first. `bookmaker` lists each bookmaker with its own copy of the markets, the shape v1 launched with.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "market",
+            "bookmaker"
+          ],
+          "default": "market"
+        }
+      },
+      "NonParticipantFilter": {
+        "in": "query",
+        "name": "non_participant",
+        "description": "Comma-separated non-participation rules (`void`, `loses`, `under`, `fair_price`). Keeps only player-market prices whose bookmaker settles a player who takes no part by one of these rules; prices on every other market are unaffected. For example `non_participant=void` keeps only player prices that are refunded when the player does not play.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Cursor": {
+        "in": "query",
+        "name": "cursor",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Limit": {
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 25
+        }
+      },
+      "RaceId": {
+        "in": "path",
+        "name": "race_id",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/RaceId"
+        }
+      }
+    },
+    "schemas": {
+      "Key": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{1,47}$"
+      },
+      "EventId": {
+        "type": "string",
+        "pattern": "^ev_[0-9a-hjkmnp-tv-z]{12}$"
+      },
+      "PlayerId": {
+        "type": "string",
+        "pattern": "^pl_[0-9a-hjkmnp-tv-z]{12}$"
+      },
+      "MarketId": {
+        "type": "string",
+        "pattern": "^mk_[0-9a-hjkmnp-tv-z]{16}$"
+      },
+      "OutcomeId": {
+        "type": "string",
+        "pattern": "^oc_[0-9a-hjkmnp-tv-z]{16}$"
+      },
+      "Meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "count",
+          "cursor"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "next"
+        ],
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri-reference"
+          }
+        }
+      },
+      "NamedKey": {
+        "type": "object",
+        "required": [
+          "key",
+          "name"
+        ],
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "League": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sport": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "region": {
+                "$ref": "#/components/schemas/Key"
+              }
+            }
+          }
+        ]
+      },
+      "Bookmaker": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "regions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Key"
+                }
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "sportsbook",
+                  "exchange",
+                  "prediction_market"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Sport": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          {
+            "type": "object",
+            "required": [
+              "participants"
+            ],
+            "properties": {
+              "participants": {
+                "type": "string",
+                "enum": [
+                  "teams",
+                  "competitors"
+                ],
+                "description": "Who contests an event. Team sports use the participant roles home and away; individual sports (tennis, mixed martial arts) use competitor_1 and competitor_2."
+              }
+            }
+          }
+        ]
+      },
+      "MarketDescriptor": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string",
+                "enum": [
+                  "event",
+                  "team",
+                  "player"
+                ]
+              },
+              "periods": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Key"
+                }
+              },
+              "ungraded_periods": {
+                "description": "Periods this market is quoted for but not yet graded, because no results source supplies the statistic yet. Results for quotes in these periods stay pending. Listed where audited; its absence is not a guarantee that a period grades. It is per market across all its sports, so a period is listed if it is ungraded in any of them.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Key"
+                }
+              },
+              "sports": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Key"
+                }
+              },
+              "non_participant": {
+                "description": "Player markets only. The non-participation rules a price on this market may carry (see the `non_participant` of each price in the odds routes). Every player-market price carries one.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NonParticipant"
+                }
+              },
+              "sides": {
+                "description": "Side keys, or participants when each outcome is a player runner, or scores for exact-score outcomes. A market offers home and away only in team sports and competitor_1 and competitor_2 only in tennis and UFC.",
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Key"
+                    }
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "participants",
+                      "scores"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Team": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "name",
+          "sport"
+        ],
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sport": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "leagues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Key"
+            }
+          }
+        }
+      },
+      "Player": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "sport",
+          "team"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/PlayerId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sport": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "team": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NamedKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Participant": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "identity"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "home",
+              "away",
+              "competitor_1",
+              "competitor_2"
+            ],
+            "description": "home and away in team sports. In tennis and UFC, competitor_1 and competitor_2 in the order the event's trusted fixture source lists them; there is no home side."
+          },
+          "identity": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NamedKey"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/PlayerId"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "league",
+          "scheduled_start",
+          "status",
+          "participants"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/EventId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "league": {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          "scheduled_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cricket_format": {
+            "type": "string",
+            "enum": [
+              "odi",
+              "test"
+            ],
+            "description": "Official format, present for supported cricket events"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "live",
+              "final",
+              "postponed",
+              "cancelled"
+            ]
+          },
+          "participants": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "$ref": "#/components/schemas/Participant"
+            }
+          }
+        }
+      },
+      "OfficialSource": {
+        "type": "string",
+        "enum": [
+          "espn",
+          "afl",
+          "nrl"
+        ]
+      },
+      "OfficialRef": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9:~._-]{0,63}$"
+      },
+      "EventLookup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "ref",
+          "event"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/OfficialSource"
+          },
+          "ref": {
+            "$ref": "#/components/schemas/OfficialRef"
+          },
+          "event": {
+            "$ref": "#/components/schemas/Event"
+          }
+        }
+      },
+      "ExchangeContract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "selection_ref",
+          "side",
+          "unit",
+          "price"
+        ],
+        "description": "Native buy contract underlying the enclosing rounded decimal odds. Available is a native quantity; price is the fraction of payout per share/contract. Buy cost equals price times available times payout_per_contract before fees; omitted payout means 1. Novig pays USD 0.01 per contract, Fanatics Markets USD 1. An opposite contract is not a lay.",
+        "properties": {
+          "selection_ref": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "contracts",
+              "shares"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
+          },
+          "available": {
+            "type": "number",
+            "minimum": 0
+          },
+          "payout_per_contract": {
+            "type": "number",
+            "enum": [
+              0.01,
+              1
+            ],
+            "description": "Native monetary payout in liquidity.currency per contract; omitted means 1 for existing feeds."
+          }
+        }
+      },
+      "ExchangeLiquidity": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Verified native exchange depth for this outcome, line and quoted back price, at the enclosing price's observed_at. Available amounts are resting stake, not guaranteed account limits or lay liability. Absent when not reported or the current price is unavailable.",
+        "required": [
+          "currency"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "market_ref"
+            ]
+          },
+          {
+            "required": [
+              "offer_ref"
+            ]
+          }
+        ],
+        "properties": {
+          "market_ref": {
+            "type": "string",
+            "description": "Native exchange market reference; joins the market-level exchanges entry."
+          },
+          "offer_ref": {
+            "type": "string",
+            "description": "BetOpenly offer identifier when the feed supplies no native market ID."
+          },
+          "contract": {
+            "$ref": "#/components/schemas/ExchangeContract"
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z]{3}$",
+            "description": "Capture currency when verified; null means unknown. Never infer currency from bookmaker region."
+          },
+          "available_to_back": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Unrounded amount available at the enclosing decimal_odds."
+          },
+          "lay": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decimal_odds"
+            ],
+            "properties": {
+              "decimal_odds": {
+                "type": "number",
+                "exclusiveMinimum": 1,
+                "description": "Best lay price for this same selection and line."
+              },
+              "available": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Resting stake available at this lay price, not liability."
+              }
+            }
+          }
+        }
+      },
+      "ExchangeMarket": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One native exchange market's reported activity. Missing matched_volume means unreported, never zero. Kalshi and Novig traded_contracts is a count, not money. Never sum runner volumes. A native market can span canonical lines; the same market_ref total may therefore appear under multiple lines and must not be added together. Current observations only; no liquidity history or opening/closing volume is promised.",
+        "required": [
+          "bookmaker",
+          "market_ref",
+          "currency",
+          "observed_at"
+        ],
+        "properties": {
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "market_ref": {
+            "type": "string"
+          },
+          "matched_volume": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Verified monetary volume from the native market, never a contract count or open-order activity."
+          },
+          "traded_contracts": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Kalshi volume_fp or Novig native market volume in contracts. This is not matched money."
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z]{3}$"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Outcome": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "side",
+          "line",
+          "decimal_odds",
+          "implied_probability",
+          "alternate",
+          "bookmaker",
+          "observed_at"
+        ],
+        "properties": {
+          "liquidity": {
+            "$ref": "#/components/schemas/ExchangeLiquidity"
+          },
+          "id": {
+            "$ref": "#/components/schemas/OutcomeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string",
+            "description": "A catalogue side key or player runner ID. Team sports name participants home and away; tennis and UFC name them competitor_1 and competitor_2, the event's participant roles. Exact-score outcomes use score_<home>_<away> in registry home/away order with integer scores from 0 through 999. Half-time/full-time outcomes use <half-time>_<full-time> with each stage home, draw or away (home_draw means home leads at half time and it is a draw at full time)."
+          },
+          "line": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The outcome's own line. On a handicap each outcome carries its own figure: home -6.5 with away +6.5, and in tennis competitor_1 -2.5 with competitor_2 +2.5 (games). Null when the market has no line."
+          },
+          "decimal_odds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the current quote is available and fresh. Stale or withdrawn quotes appear only when snapshots are requested and carry null current prices."
+          },
+          "alternate": {
+            "type": "boolean"
+          },
+          "non_participant": {
+            "$ref": "#/components/schemas/NonParticipant",
+            "description": "Player markets only, and only when the rule is not `void`: this shape stays byte for byte the launch body, so an absent value on a player market means `void`. Grouped by market, every player price carries it."
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "opening": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The first quote before the `snapshots` cutoff, skipping withdrawals. Null when there is none."
+          },
+          "closing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The last quote before the `snapshots` cutoff. Null when there is none. For every sport but MMA it is also null when that last row is a withdrawal (the book pulled the price before `scheduled_start`); it never falls back to an earlier price. For an MMA bout withdrawals are skipped, so closing is the last price offered before the cutoff."
+          }
+        }
+      },
+      "NonParticipant": {
+        "type": "string",
+        "enum": [
+          "void",
+          "loses",
+          "under",
+          "fair_price"
+        ],
+        "description": "Player markets only: how this bookmaker settles this price when the player takes no part, from the bookmaker's own published rules. `void`: the stake is returned. `loses`: all-in, the bet stands and loses. `under`: the bet settles as the Under (or No) side. `fair_price`: the venue settles at a fair price it sets. /v1/results grades the outcomes of a player who took no part `void`; a price whose rule is not `void` settles differently at that bookmaker."
+      },
+      "PriceSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "decimal_odds",
+          "implied_probability",
+          "observed_at"
+        ],
+        "properties": {
+          "decimal_odds": {
+            "type": "number",
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuotedMarket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "subject",
+          "period",
+          "outcomes"
+        ],
+        "properties": {
+          "exchanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeMarket"
+            }
+          },
+          "id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NamedKey"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/PlayerId"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "period": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Outcome"
+            }
+          }
+        }
+      },
+      "Price": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One bookmaker's current price for an outcome.",
+        "required": [
+          "bookmaker",
+          "decimal_odds",
+          "implied_probability",
+          "available",
+          "observed_at"
+        ],
+        "properties": {
+          "liquidity": {
+            "$ref": "#/components/schemas/ExchangeLiquidity"
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "decimal_odds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the quote is available and fresh. Stale or withdrawn quotes appear only when snapshots are requested and carry null current prices."
+          },
+          "opening": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The first quote before the `snapshots` cutoff, skipping withdrawals. Null when there is none."
+          },
+          "closing": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The last quote before the `snapshots` cutoff. Null when there is none. For every sport but MMA it is also null when that last row is a withdrawal (the book pulled the price before `scheduled_start`); it never falls back to an earlier price. For an MMA bout withdrawals are skipped, so closing is the last price offered before the cutoff."
+          },
+          "non_participant": {
+            "$ref": "#/components/schemas/NonParticipant"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PricedOutcome": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "side",
+          "line",
+          "prices"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/OutcomeId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string",
+            "description": "A catalogue side key or player runner ID, as on Outcome."
+          },
+          "line": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The outcome's own line: home -6.5 with away +6.5. Null when the market has no line."
+          },
+          "prices": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Every bookmaker price for this outcome, best first: highest decimal odds, then bookmaker key. prices[0] is the best price among the bookmakers asked for. A price with no current odds (snapshots only) comes last.",
+            "items": {
+              "$ref": "#/components/schemas/Price"
+            }
+          }
+        }
+      },
+      "PricedMarket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "period",
+          "subject",
+          "alternate",
+          "outcomes"
+        ],
+        "properties": {
+          "exchanges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExchangeMarket"
+            }
+          },
+          "id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NamedKey"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/PlayerId"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "alternate": {
+            "type": "boolean",
+            "description": "True when this line is not the market's main line. Alternate lines appear only with alternates=true."
+          },
+          "outcomes": {
+            "type": "array",
+            "minItems": 1,
+            "description": "In the market's side order (home, draw, away; over, under); players and scores by name.",
+            "items": {
+              "$ref": "#/components/schemas/PricedOutcome"
+            }
+          }
+        }
+      },
+      "QuotedBookmaker": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "name",
+          "markets"
+        ],
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "markets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuotedMarket"
+            }
+          }
+        }
+      },
+      "OddsEvent": {
+        "description": "An event with its prices grouped by market (the default). Markets come in catalogue order, then period, subject and line.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Event"
+          },
+          {
+            "type": "object",
+            "required": [
+              "markets"
+            ],
+            "properties": {
+              "markets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PricedMarket"
+                }
+              }
+            }
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "OddsEventByBookmaker": {
+        "description": "An event with its prices grouped by bookmaker (group_by=bookmaker), the shape v1 launched with.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Event"
+          },
+          {
+            "type": "object",
+            "required": [
+              "bookmakers"
+            ],
+            "properties": {
+              "bookmakers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/QuotedBookmaker"
+                }
+              }
+            }
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "RecordedMarket": {
+        "type": "object",
+        "required": [
+          "id",
+          "key",
+          "name",
+          "period",
+          "subject"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/MarketId"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "name": {
+            "type": "string"
+          },
+          "period": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NamedKey"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/PlayerId"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "HistoryChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event",
+          "market",
+          "outcome",
+          "bookmaker",
+          "observed_at",
+          "kind",
+          "decimal_odds"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventId"
+          },
+          "market": {
+            "$ref": "#/components/schemas/RecordedMarket"
+          },
+          "outcome": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "side"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/OutcomeId"
+              },
+              "name": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              }
+            }
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "opened",
+              "changed",
+              "withdrawn"
+            ]
+          },
+          "decimal_odds": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "implied_probability": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "line": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      },
+      "HistoryFile": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "league",
+          "day",
+          "rows",
+          "bytes",
+          "sha256",
+          "observed_from",
+          "observed_to",
+          "url"
+        ],
+        "properties": {
+          "league": {
+            "$ref": "#/components/schemas/NamedKey"
+          },
+          "day": {
+            "type": "string",
+            "format": "date"
+          },
+          "rows": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observed_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observed_to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "HistoryFilesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryFile"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "BoxScore": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "The box score of a finished event: the official statistics results are graded from (the score by period, event and team totals, and the player statistics SockOdds grades, for players the registry identifies), as the source publishes them. Corrections at the source increase `revision`. Players are identified by player ID, with the name and team the player registry holds now; a player merged since is shown under the ID he was merged into.",
+        "required": [
+          "revision",
+          "observed_at",
+          "periods",
+          "players",
+          "unmatched",
+          "withheld_players"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Increases each time the official box score changes (a correction at the source)."
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the official source was read for this revision."
+          },
+          "periods": {
+            "type": "array",
+            "description": "One entry per period the source scores (period keys as in /v1/leagues).",
+            "items": {
+              "type": "object",
+              "required": [
+                "period",
+                "completed"
+              ],
+              "properties": {
+                "period": {
+                  "type": "string",
+                  "example": "quarter_1"
+                },
+                "completed": {
+                  "type": "boolean"
+                },
+                "void": {
+                  "type": "boolean",
+                  "description": "Present and true when the period was voided."
+                },
+                "home": {
+                  "type": "number",
+                  "description": "Home team score in the period."
+                },
+                "away": {
+                  "type": "number",
+                  "description": "Away team score in the period."
+                },
+                "totals": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "Event totals in the period, by statistic (for example points, goals, corners)."
+                },
+                "home_stats": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "Home team statistics in the period."
+                },
+                "away_stats": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "Away team statistics in the period."
+                },
+                "competitors": {
+                  "type": "object",
+                  "description": "Tennis and UFC: the official winner (competitor_1 or competitor_2), how the contest ended, and for UFC the method."
+                },
+                "competitor_games": {
+                  "type": "object",
+                  "description": "Tennis: games won by each competitor."
+                },
+                "first_team_to_score": {
+                  "type": "string",
+                  "enum": [
+                    "home",
+                    "away",
+                    "none"
+                  ]
+                },
+                "cricket": {
+                  "type": "object",
+                  "description": "Cricket: the official result (format and outcome)."
+                }
+              }
+            }
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "team",
+                "stats"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Player ID (as in /v1/players)."
+                },
+                "name": {
+                  "type": "string"
+                },
+                "team": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NamedKey"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The team the player registry holds for the player now."
+                },
+                "stats": {
+                  "type": "object",
+                  "description": "Statistics by period, then by statistic: { \"full\": { \"points\": 31, \"rebounds\": 9 } }.",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "did_not_play": {
+                  "type": "object",
+                  "description": "By period: statistics the official source voids because the player took no part.",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "unmatched": {
+            "description": "Athletes the official source lists that no published registry player is identified with (including an identity under review): the source's own athlete ID and name. null when the read did not list the source's athletes.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "source_ref",
+                    "name"
+                  ],
+                  "properties": {
+                    "source_ref": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "withheld_players": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Players in the box score whose identity the registry does not publish now (under review or merged); they are not listed."
+          }
+        },
+        "example": {
+          "revision": 1,
+          "observed_at": "2026-10-16T10:12:00.000Z",
+          "periods": [
+            {
+              "period": "quarter_1",
+              "completed": true,
+              "home": 27,
+              "away": 22,
+              "totals": {
+                "points": 49
+              }
+            },
+            {
+              "period": "full",
+              "completed": true,
+              "home": 104,
+              "away": 96,
+              "totals": {
+                "points": 200
+              }
+            }
+          ],
+          "players": [
+            {
+              "id": "pl_000000000aaa",
+              "name": "Example Guard",
+              "team": {
+                "key": "example_home",
+                "name": "Example Home"
+              },
+              "stats": {
+                "full": {
+                  "points": 31,
+                  "rebounds": 9
+                }
+              }
+            }
+          ],
+          "unmatched": [],
+          "withheld_players": 0
+        }
+      },
+      "Result": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event",
+          "status",
+          "settlement",
+          "pending_markets",
+          "settled_at",
+          "outcomes"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/Event"
+          },
+          "box_score": {
+            "description": "Always present on /v1/results: the official statistics the result is graded from, or null while none have been read.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BoxScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "final",
+              "corrected"
+            ]
+          },
+          "settlement": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial"
+            ],
+            "description": "complete when every quoted market on the event is settled; partial while any market is still pending."
+          },
+          "pending_markets": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "How many quoted markets on the event are still pending. A market is pending until official evidence settles every one of its outcomes."
+          },
+          "settled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "outcomes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "name",
+                "verdict",
+                "market",
+                "side",
+                "line"
+              ],
+              "if": {
+                "properties": {
+                  "verdict": {
+                    "const": "dead_heat"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "dead_heat_factor"
+                ]
+              },
+              "else": {
+                "not": {
+                  "required": [
+                    "dead_heat_factor"
+                  ]
+                }
+              },
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/OutcomeId"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "won",
+                    "lost",
+                    "void",
+                    "dead_heat",
+                    "half_won",
+                    "half_lost"
+                  ],
+                  "description": "half_won / half_lost: an Asian quarter line (x.25 / x.75) whose two half stakes split: one half won (or lost) at the quoted price and the other half refunded."
+                },
+                "dead_heat_factor": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "exclusiveMaximum": 1,
+                  "description": "Dead heats only: the share of the stake paid at the quoted price. The rest of the stake is lost."
+                },
+                "market": {
+                  "$ref": "#/components/schemas/RecordedMarket"
+                },
+                "side": {
+                  "type": "string"
+                },
+                "line": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri-reference"
+          }
+        }
+      },
+      "SportsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sport"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "LeaguesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/League"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "BookmakersEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Bookmaker"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "MarketsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MarketDescriptor"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "TeamsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Team"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PlayersEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Player"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EventsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "OddsEventsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OddsEvent"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "OddsEventsByBookmakerEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OddsEventByBookmaker"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "HistoryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoryChange"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "ResultsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Result"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EventEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Event"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EventLookupsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventLookup"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "OddsEventEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OddsEvent"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "OddsEventByBookmakerEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OddsEventByBookmaker"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "RaceId": {
+        "type": "string",
+        "pattern": "^(thoroughbred|harness|greyhound)_\\d{4}-\\d{2}-\\d{2}_[A-Za-z0-9_.-]{1,120}$"
+      },
+      "Race": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "code",
+          "meeting",
+          "race_number",
+          "name",
+          "distance_m",
+          "scheduled_start",
+          "jumped_at",
+          "status",
+          "runner_count",
+          "bookmaker_count",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/RaceId"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "thoroughbred",
+              "harness",
+              "greyhound"
+            ]
+          },
+          "meeting": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "state",
+              "country"
+            ],
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "state": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Australian state or territory; null in New Zealand."
+              },
+              "country": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "AUS",
+                  "NZL",
+                  null
+                ]
+              }
+            }
+          },
+          "race_number": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "distance_m": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "scheduled_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "jumped_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the race was first seen off."
+          },
+          "status": {
+            "type": "string",
+            "description": "`open`, `resulted` or `abandoned`."
+          },
+          "runner_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "bookmaker_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Runner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "number",
+          "name",
+          "barrier",
+          "jockey",
+          "trainer",
+          "scratched"
+        ],
+        "properties": {
+          "number": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "barrier": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "jockey": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trainer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scratched": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RaceResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "placings",
+          "scratched",
+          "recorded_at"
+        ],
+        "properties": {
+          "placings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "runner_number",
+                "position"
+              ],
+              "properties": {
+                "runner_number": {
+                  "type": "integer"
+                },
+                "position": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "scratched": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "RaceCard": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Race"
+          },
+          {
+            "type": "object",
+            "required": [
+              "runners",
+              "result"
+            ],
+            "properties": {
+              "runners": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Runner"
+                }
+              },
+              "result": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RaceResult"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "RacePrice": {
+        "type": "object",
+        "required": [
+          "bookmaker",
+          "bookmaker_name",
+          "observed_at",
+          "available"
+        ],
+        "properties": {
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "bookmaker_name": {
+            "type": "string"
+          },
+          "win": {
+            "type": "number",
+            "description": "Fixed-odds win price (decimal); on Betfair Exchange the best back price."
+          },
+          "place": {
+            "type": "number",
+            "description": "Fixed-odds place price (decimal); on Betfair Exchange the best back price."
+          },
+          "win_lay": {
+            "type": "number",
+            "description": "Betfair Exchange only."
+          },
+          "place_lay": {
+            "type": "number",
+            "description": "Betfair Exchange only."
+          },
+          "win_back_size": {
+            "type": "number",
+            "description": "Betfair Exchange only. AUD available at the back price."
+          },
+          "win_lay_size": {
+            "type": "number",
+            "description": "Betfair Exchange only. AUD available at the lay price."
+          },
+          "place_back_size": {
+            "type": "number",
+            "description": "Betfair Exchange only."
+          },
+          "place_lay_size": {
+            "type": "number",
+            "description": "Betfair Exchange only."
+          },
+          "win_matched": {
+            "type": "number",
+            "description": "Betfair Exchange only. AUD matched on the runner."
+          },
+          "place_matched": {
+            "type": "number",
+            "description": "Betfair Exchange only."
+          },
+          "place_winners": {
+            "type": "number",
+            "description": "Betfair Exchange only. How many places the place market pays."
+          },
+          "observed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RaceSnapshot": {
+        "type": "object",
+        "properties": {
+          "win": {
+            "$ref": "#/components/schemas/RaceSnapshotPrice"
+          },
+          "place": {
+            "$ref": "#/components/schemas/RaceSnapshotPrice"
+          }
+        }
+      },
+      "RaceSnapshotPrice": {
+        "type": "object",
+        "required": [
+          "decimal_odds",
+          "bookmaker",
+          "observed_at"
+        ],
+        "properties": {
+          "decimal_odds": {
+            "type": "number"
+          },
+          "bookmaker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "exchange_back": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Closing only. Betfair Exchange back price at the jump."
+          },
+          "exchange_lay": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Closing only. Betfair Exchange lay price at the jump."
+          }
+        }
+      },
+      "RaceOdds": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "race",
+          "runners"
+        ],
+        "properties": {
+          "race": {
+            "$ref": "#/components/schemas/Race"
+          },
+          "runners": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "number",
+                "name",
+                "barrier",
+                "scratched",
+                "prices"
+              ],
+              "properties": {
+                "number": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "barrier": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "scratched": {
+                  "type": "boolean"
+                },
+                "prices": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RacePrice"
+                  }
+                },
+                "opening": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RaceSnapshot"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "closing": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RaceSnapshot"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "RaceHistoryChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runner_number",
+          "bookmaker",
+          "market",
+          "decimal_odds",
+          "observed_at"
+        ],
+        "properties": {
+          "runner_number": {
+            "type": "integer"
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "market": {
+            "type": "string",
+            "enum": [
+              "win",
+              "place"
+            ]
+          },
+          "decimal_odds": {
+            "type": "number"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RacesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Race"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "RaceEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RaceCard"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "RaceOddsEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RaceOdds"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "RaceHistoryEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RaceHistoryChange"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "count",
+              "cursor",
+              "truncated"
+            ],
+            "properties": {
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cursor": {
+                "type": "null"
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Sports": {
+        "description": "Sports",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SportsEnvelope"
+            }
+          }
+        }
+      },
+      "Leagues": {
+        "description": "Leagues",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LeaguesEnvelope"
+            }
+          }
+        }
+      },
+      "Bookmakers": {
+        "description": "Bookmakers",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/BookmakersEnvelope"
+            }
+          }
+        }
+      },
+      "Markets": {
+        "description": "Markets",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/MarketsEnvelope"
+            }
+          }
+        }
+      },
+      "Teams": {
+        "description": "Teams",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TeamsEnvelope"
+            }
+          }
+        }
+      },
+      "Players": {
+        "description": "Players",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PlayersEnvelope"
+            }
+          }
+        }
+      },
+      "Events": {
+        "description": "Events",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EventsEnvelope"
+            }
+          }
+        }
+      },
+      "Event": {
+        "description": "Event",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EventEnvelope"
+            }
+          }
+        }
+      },
+      "EventLookup": {
+        "description": "Event lookup",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/EventEnvelope"
+                },
+                {
+                  "$ref": "#/components/schemas/EventLookupsEnvelope"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OddsEvents": {
+        "description": "Current prices, grouped by market unless group_by=bookmaker",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/OddsEventsEnvelope"
+                },
+                {
+                  "$ref": "#/components/schemas/OddsEventsByBookmakerEnvelope"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OddsEvent": {
+        "description": "Event prices, grouped by market unless group_by=bookmaker",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/OddsEventEnvelope"
+                },
+                {
+                  "$ref": "#/components/schemas/OddsEventByBookmakerEnvelope"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "History": {
+        "description": "Historical changes",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HistoryEnvelope"
+            }
+          }
+        }
+      },
+      "HistoryFiles": {
+        "description": "History day files",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HistoryFilesEnvelope"
+            }
+          }
+        }
+      },
+      "Results": {
+        "description": "Results",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ResultsEnvelope"
+            }
+          }
+        }
+      },
+      "Problem": {
+        "description": "Request failed",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Races": {
+        "description": "Races",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RacesEnvelope"
+            }
+          }
+        }
+      },
+      "Race": {
+        "description": "Race card",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RaceEnvelope"
+            }
+          }
+        }
+      },
+      "RaceOdds": {
+        "description": "Race prices",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RaceOddsEnvelope"
+            }
+          }
+        }
+      },
+      "RaceHistory": {
+        "description": "Race price movement",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RaceHistoryEnvelope"
+            }
+          }
+        }
+      }
+    }
+  }
+}

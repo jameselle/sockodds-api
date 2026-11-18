@@ -1,0 +1,5 @@
+Example East v Example West: final, partial, markets pending: 1
+  winner (full) home at 1.85: won, stake 10.00, returns 18.50, profit 8.50
+  winner (half_1) home at 2.10: dead_heat, stake 10.00, returns 10.50, profit 0.50
+  handicap (full) away 3.5 at 1.90: lost, stake 20.00, returns 0.00, profit -20.00
+  total_points (full) over 45.5 at 1.87: pending, stake 10.00 still open

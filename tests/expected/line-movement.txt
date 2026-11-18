@@ -1,0 +1,6 @@
+sample_book_a  Example Away   1.90 to 1.98 (+0.08), changes: 2, latest 2026-12-05T07:58:00.000Z
+sample_book_a  Example Home   1.95 to 1.87 (-0.08), changes: 2, latest 2026-12-05T07:58:00.000Z
+sample_book_b  Example Away   1.82 to 1.90 (+0.08), changes: 2, latest 2026-12-05T07:58:00.000Z
+sample_book_b  Example Home   2.03 to 1.95 (-0.08), changes: 2, latest 2026-12-05T07:58:00.000Z
+sample_book_c  Example Away   1.96 to 2.04 (+0.08), changes: 2, latest 2026-12-05T07:58:00.000Z
+sample_book_c  Example Home   1.93 to 1.85 (-0.08), changes: 2, latest 2026-12-05T07:58:00.000Z

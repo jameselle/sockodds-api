@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "key": "sample_sport",
+      "name": "Sample sport",
+      "participants": "teams"
+    }
+  ],
+  "meta": {
+    "count": 1,
+    "cursor": null
+  },
+  "links": {
+    "next": null
+  }
+}
+Next game: Example Home v Example Away, starts 2026-12-05T09:30:00.000Z (scheduled)
+  Example Home: best 1.95 at sample_book_b, 3 bookmaker(s) quoting, seen 2026-12-05T07:58:00.000Z
+  Example Away: best 2.04 at sample_book_c, 3 bookmaker(s) quoting, seen 2026-12-05T07:58:00.000Z

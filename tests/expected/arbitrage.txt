@@ -1,0 +1,15 @@
+Example Home v Example Away
+  Winner (full)
+    home: 1.95 at sample_book_b
+    away: 2.04 at sample_book_c
+    sum 1.0030, margin 0.30%, over 1: no arbitrage
+  Line -3.5 (full)
+    home: 1.95 at sample_book_c
+    away: 1.91 at sample_book_a
+    sum 1.0364, margin 3.64%, over 1: no arbitrage
+  Total points 45.5 (full)
+    over: 2.08 at sample_book_b
+    under: 1.95 at sample_book_a
+    sum 0.9936, margin -0.64%, under 1: check every price is still up
+Example North v Example South
+  Winner (full): skipped, not every side has a current price

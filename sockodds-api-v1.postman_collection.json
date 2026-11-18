@@ -1,0 +1,1009 @@
+{
+  "info": {
+    "_postman_id": "c9e072a2-127a-577b-9835-d707fd4a16c3",
+    "name": "SockOdds API v1",
+    "description": "Bookmaker prices SockOdds records itself, readable identifiers, recorded price history and graded results for Australian and global sport.\n\nGenerated from openapi.json by scripts/generate_postman.py (contract version 1.0.0).\n\nSet the `sockoddsKey` collection variable to your key, as the current value only, so it is never shared or exported. Get a free key at https://sockodds.com/signup/.\n\nIds, dates and keys in the example values are placeholders: replace them with values from your own responses.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sockoddsKey}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.sockodds.com/v1",
+      "type": "string"
+    },
+    {
+      "key": "sockoddsKey",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Catalogue",
+      "item": [
+        {
+          "name": "listSports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sports",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sports"
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listSports"
+          },
+          "response": []
+        },
+        {
+          "name": "listLeagues",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leagues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leagues"
+              ],
+              "query": [
+                {
+                  "key": "sport",
+                  "value": "american_football",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listLeagues"
+          },
+          "response": []
+        },
+        {
+          "name": "listBookmakers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookmakers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bookmakers"
+              ],
+              "query": [
+                {
+                  "key": "regions",
+                  "value": "au",
+                  "description": "Comma-separated bookmaker regions, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listBookmakers"
+          },
+          "response": []
+        },
+        {
+          "name": "listMarkets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/markets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "markets"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Markets and the sides each offers. With `league`, only the markets offered in that league's sport, and only the role sides that sport uses (winner and handicap are home and away in team sports, competitor_1 and competitor_2 in tennis; winner is also offered in UFC).\n\nReference: https://sockodds.com/docs/#listMarkets"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Identity",
+      "item": [
+        {
+          "name": "listTeams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listTeams"
+          },
+          "response": []
+        },
+        {
+          "name": "listPlayers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/players",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "players"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "team",
+                  "value": "team_key",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listPlayers"
+          },
+          "response": []
+        },
+        {
+          "name": "listEvents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "UTC date and time. With neither starts_after nor starts_before, the list starts 48 hours ago (live and upcoming games plus the last two days), and international cricket Tests (league cricket) are listed for six days from their start; name a window to list older games.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_before",
+                  "value": "2026-01-02T00:00:00Z",
+                  "description": "UTC date and time. Give starts_after, starts_before or both to list games outside the default window (from 48 hours ago; six days for cricket Tests).",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#listEvents"
+          },
+          "response": []
+        },
+        {
+          "name": "lookupEvents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/lookup?source=espn&ref=401000001",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "source",
+                  "value": "espn",
+                  "description": "Required. Who issued the id: `espn`, `afl` for AFLW match ids, or `nrl` for Rugby League World Cup match ids."
+                },
+                {
+                  "key": "ref",
+                  "value": "401000001",
+                  "description": "One official event id. Use this or `refs`, not both."
+                },
+                {
+                  "key": "refs",
+                  "value": "401000001,401000002",
+                  "description": "Comma-separated official event ids, at most 100. Use this or `ref`, not both.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Find our event from an official event id: ESPN's event id, the AFL's match id (`CD_M` and digits) for AFLW, or the NRL's match id (digits) for the Rugby League World Cup. Send `ref` for one event, or `refs` for up to 100 at once. With `ref`, the response is the event, or 404 when no event carries that id. With `refs`, the response lists the ids that matched, in the order sent, each with its event; ids that match nothing are left out. A merged event returns the event it was merged into. Only official sources can be looked up, never a bookmaker's listing id. Each event returned counts as one object towards your allowance, like an event read.\n\nReference: https://sockodds.com/docs/#lookupEvents"
+          },
+          "response": []
+        },
+        {
+          "name": "getEvent",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/:event_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                ":event_id"
+              ],
+              "variable": [
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Reference: https://sockodds.com/docs/#getEvent"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prices",
+      "item": [
+        {
+          "name": "getEventOdds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/:event_id/odds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                ":event_id",
+                "odds"
+              ],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "au",
+                  "description": "Comma-separated bookmaker regions, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "alternates",
+                  "value": "false",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "group_by",
+                  "value": "market",
+                  "description": "How prices are grouped. `market` (the default) lists each market and outcome once, with every bookmaker's price under the outcome in `prices`, best price first. `bookmaker` lists each bookmaker with its own copy of the markets, the shape v1 launched with.",
+                  "disabled": true
+                },
+                {
+                  "key": "non_participant",
+                  "value": "void",
+                  "description": "Comma-separated non-participation rules (`void`, `loses`, `under`, `fair_price`). Keeps only player-market prices whose bookmaker settles a player who takes no part by one of these rules; prices on every other market are unaffected. For example `non_participant=void` keeps only player prices that are refunded when the player does not play.",
+                  "disabled": true
+                },
+                {
+                  "key": "snapshots",
+                  "value": "opening,closing",
+                  "description": "Pro only. Adds `opening`, `closing` or both, as requested, to each price, from that bookmaker's own quotes observed strictly before a cutoff (a quote stamped exactly at the cutoff does not count). For every sport but MMA the cutoff is the event's `scheduled_start`, so in-play quotes never count. For an MMA bout, whose `scheduled_start` is its card segment's start, the cutoff once the bout has been observed live or final (first at F) is the last poll that still showed it `scheduled` before F, but never earlier than the earlier of `scheduled_start` and F; a bout never observed live or final uses `scheduled_start`.",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Current prices for one event, grouped by market: each market and outcome appears once, and each outcome lists every bookmaker's price in `prices`, best price first. Markets come in catalogue order, then period, subject and line; outcomes in the market's side order. Use `group_by=bookmaker` for one block per bookmaker instead (the shape v1 launched with). Each price counts as one object towards your allowance, plus one for the event, in either shape.\n\nReference: https://sockodds.com/docs/#getEventOdds"
+          },
+          "response": []
+        },
+        {
+          "name": "listOdds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odds"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "au",
+                  "description": "Comma-separated bookmaker regions, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "UTC date and time. With neither starts_after nor starts_before, the list starts 48 hours ago (live and upcoming games plus the last two days), and international cricket Tests (league cricket) are listed for six days from their start; name a window to list older games.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_before",
+                  "value": "2026-01-02T00:00:00Z",
+                  "description": "UTC date and time. Give starts_after, starts_before or both to list games outside the default window (from 48 hours ago; six days for cricket Tests).",
+                  "disabled": true
+                },
+                {
+                  "key": "alternates",
+                  "value": "false",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "group_by",
+                  "value": "market",
+                  "description": "How prices are grouped. `market` (the default) lists each market and outcome once, with every bookmaker's price under the outcome in `prices`, best price first. `bookmaker` lists each bookmaker with its own copy of the markets, the shape v1 launched with.",
+                  "disabled": true
+                },
+                {
+                  "key": "non_participant",
+                  "value": "void",
+                  "description": "Comma-separated non-participation rules (`void`, `loses`, `under`, `fair_price`). Keeps only player-market prices whose bookmaker settles a player who takes no part by one of these rules; prices on every other market are unaffected. For example `non_participant=void` keeps only player prices that are refunded when the player does not play.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Current prices for a page of events (25 by default, up to 100), grouped by market as on /events/{event_id}/odds unless `group_by=bookmaker`. Pages follow events; a cursor works only with the filters and grouping it was issued for, so follow `links.next`. Filters apply to prices before grouping: an outcome or market with no matching price is left out, and an event with none has an empty `markets` list. Each price counts as one object towards your allowance, plus one per event.\n\nReference: https://sockodds.com/docs/#listOdds"
+          },
+          "response": []
+        },
+        {
+          "name": "listOddsHistory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/odds/history?event_id=ev_0000000000a1&from=2026-01-01T00:00:00Z&to=2026-01-01T08:00:00Z",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "odds",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Required."
+                },
+                {
+                  "key": "from",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "Required."
+                },
+                {
+                  "key": "to",
+                  "value": "2026-01-01T08:00:00Z",
+                  "description": "Required."
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "250",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro only. Own observations recorded under the new identities only. No observation predates 22 December 2025 UTC. Changes older than the live store keeps are read from the daily history archive and returned in the same shape and order, so a window reads the same whichever store holds it. Changes are ordered by observation time, then by when they were recorded. A window may not exceed 24 hours. While older history is busy the API answers 503 with a short Retry-After.\n\nReference: https://sockodds.com/docs/#listOddsHistory"
+          },
+          "response": []
+        }
+      ],
+      "description": "The odds stream is a WebSocket, so it is not in this collection: see https://sockodds.com/docs/streaming/."
+    },
+    {
+      "name": "Results",
+      "item": [
+        {
+          "name": "listResults",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/results",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "results"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "event_id",
+                  "value": "ev_0000000000a1",
+                  "description": "Restrict results to one independent event identity.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_before",
+                  "value": "2026-01-02T00:00:00Z",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Settled outcomes for finished events, graded from official result sources. Each outcome's `verdict` is `won`, `lost`, `void` (stake returned), `dead_heat`, `half_won` or `half_lost`. `half_won` / `half_lost` settle an Asian quarter line (x.25 / x.75) whose two half stakes split: one half won (or lost) at the quoted price and the other half refunded. A dead heat pays `dead_heat_factor` of the stake at the quoted price and loses the rest: a drawn AFL or AFLW head-to-head, a drawn AFLW quarter or half winner, a tied NBL quarter or half winner, and a Rugby League World Cup head-to-head still level after golden point, is a dead heat with a factor of 0.5. Outcomes that official evidence cannot settle are left out, never guessed. Each market settles on its own once official evidence settles all of its outcomes, so a result can be published while other markets on the event are still pending: `settlement` is `partial` and `pending_markets` counts them, and later results for the same event add the newly settled outcomes without changing any verdict already published. Each result also carries `box_score`: the official statistics the result is graded from (score by period, event and team totals, the player statistics SockOdds grades by player ID, and any athletes the source lists that the player registry cannot identify), or null until they have been read.\n\nReference: https://sockodds.com/docs/#listResults"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "History",
+      "item": [
+        {
+          "name": "listHistoryFiles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/history/files",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "history",
+                "files"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro only. Whole days of history as Parquet files, one file per league and UTC day, from 22 December 2025 up to two days ago. Each file holds the rows /v1/odds/history returns for that league and day, sorted by event and observation time. Own observations only. Listing bills one object per file listed.\n\nReference: https://sockodds.com/docs/#listHistoryFiles"
+          },
+          "response": []
+        },
+        {
+          "name": "getHistoryFile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/history/files/:league/:day",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "history",
+                "files",
+                ":league",
+                ":day"
+              ],
+              "variable": [
+                {
+                  "key": "league",
+                  "value": "nfl",
+                  "description": "Required."
+                },
+                {
+                  "key": "day",
+                  "value": "2026-01-01",
+                  "description": "Required. UTC day as YYYY-MM-DD."
+                }
+              ]
+            },
+            "description": "Pro only. Downloads one day of history as a zstd Parquet file. Columns: event_id, market_id, market_key, market_name, period, subject_key, subject_id, subject_name, outcome_id, outcome_name, side, line, bookmaker, observed_at (UTC, milliseconds), kind, decimal_odds, implied_probability. The ETag is the file's SHA-256. At most two downloads at a time per key. Each download bills one object. A file that names a player whose identity came under review after it was built answers 503 until it is rebuilt overnight.\n\nReference: https://sockodds.com/docs/#getHistoryFile"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Racing",
+      "item": [
+        {
+          "name": "listRaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/racing/races",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "racing",
+                "races"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "thoroughbred",
+                  "description": "Comma-separated racing codes: `thoroughbred`, `harness`, `greyhound`.",
+                  "disabled": true
+                },
+                {
+                  "key": "country",
+                  "value": "AUS",
+                  "description": "Comma-separated meeting countries: `AUS`, `NZL`.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_after",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "UTC date and time. Defaults to 6 hours ago.",
+                  "disabled": true
+                },
+                {
+                  "key": "starts_before",
+                  "value": "2026-01-02T00:00:00Z",
+                  "description": "UTC date and time. Defaults to 48 hours after starts_after. At most 8 days after starts_after.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Australian and New Zealand races: thoroughbred, harness and greyhound. Rookie and Pro (and the Pro trial); Developer keys get 403. Races come in start order, 25 a page by default, up to 100. With neither starts_after nor starts_before the list runs from 6 hours ago to 48 hours ahead; a window may span at most 8 days. Each race counts as one object. Race ids are SockOdds racing ids such as `thoroughbred_2026-11-17_AUS_scone_r1` (code, date, country, meeting, race number), not the `ev_` ids sport uses.\n\nReference: https://sockodds.com/docs/#listRaces"
+          },
+          "response": []
+        },
+        {
+          "name": "getRace",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/racing/races/:race_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "racing",
+                "races",
+                ":race_id"
+              ],
+              "variable": [
+                {
+                  "key": "race_id",
+                  "value": "thoroughbred_2026-01-01_AUS_samplemeeting_r1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "One race with its field: each runner's number (saddlecloth, or box for greyhounds), name, barrier, jockey (the driver in harness; null for greyhounds), trainer and whether it is scratched. `result` carries the placings by runner number and the scratched numbers once the race is resulted, else null.\n\nReference: https://sockodds.com/docs/#getRace"
+          },
+          "response": []
+        },
+        {
+          "name": "getRaceOdds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/racing/races/:race_id/odds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "racing",
+                "races",
+                ":race_id",
+                "odds"
+              ],
+              "query": [
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "snapshots",
+                  "value": "opening,closing",
+                  "description": "Pro only. Adds `opening` (the first price recorded for the runner, and the bookmaker that offered it) and `closing` (the last price before the jump, and the bookmaker; with the Betfair Exchange back and lay at the jump) per runner, for win and place. `closing` is null until the race has jumped.",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "race_id",
+                  "value": "thoroughbred_2026-01-01_AUS_samplemeeting_r1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Current fixed-odds win and place prices for every runner, one entry per bookmaker, and Betfair Exchange back and lay prices with the size available and the volume matched (AUD). `available` is true while the race has not jumped and the price was observed in the last 600 seconds. Scratched runners carry no prices. Rookie sees the bookmakers its plan names. The race counts as one object.\n\nReference: https://sockodds.com/docs/#getRaceOdds"
+          },
+          "response": []
+        },
+        {
+          "name": "listRaceHistory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/racing/races/:race_id/history?from=2026-01-01T00:00:00Z&to=2026-01-01T08:00:00Z",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "racing",
+                "races",
+                ":race_id",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-01-01T00:00:00Z",
+                  "description": "Required."
+                },
+                {
+                  "key": "to",
+                  "value": "2026-01-01T08:00:00Z",
+                  "description": "Required."
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "1000",
+                  "description": "",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "race_id",
+                  "value": "thoroughbred_2026-01-01_AUS_samplemeeting_r1",
+                  "description": "Required."
+                }
+              ]
+            },
+            "description": "Pro only. Every recorded change of a win or place price for one race, by runner and bookmaker, in observation order. A window may span at most 24 hours; racing movement is recorded from 16 November 2026 23:09 UTC. At most `limit` changes are returned; `meta.truncated` is true when the window may hold more, so ask again from the last `observed_at`.\n\nReference: https://sockodds.com/docs/#listRaceHistory"
+          },
+          "response": []
+        }
+      ],
+      "description": "Australian and New Zealand thoroughbred, harness and greyhound racing."
+    }
+  ]
+}
