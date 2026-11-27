@@ -1520,6 +1520,61 @@
         }
       }
     },
+    "/opportunities/lay-beat": {
+      "get": {
+        "tags": [
+          "Opportunities"
+        ],
+        "operationId": "listLayBeats",
+        "description": "Pro and above. Lay beats: a bookmaker price that beats an exchange's lay price net of the exchange's commission, the bookmaker side of an exchange arbitrage, listed to take on its own. `exchange` names the exchange it beats, with its own back and lay prices: `lay_odds` is the exchange's posted lay where it has one (Betfair, Matchbook); on an order-book exchange (Novig, ProphetX, Kalshi, Polymarket) the lay is implied by its other side, so `lay_odds` is null there. `fair` is the exchange's midpoint, the price the edge is measured against; `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; a row is listed only when your key may read both the bookmaker's and the exchange's prices. Freshness, paging and metering are as for arbitrage. No stake or liquidity figure is served. An estimate, not a guarantee: prices move, and an exchange's price can be thin.",
+        "x-example-query": "league=nba&min_edge=2&exchanges=betfair_exchange,novig",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/League"
+          },
+          {
+            "$ref": "#/components/parameters/BookmakersFilter"
+          },
+          {
+            "$ref": "#/components/parameters/MarketsFilter"
+          },
+          {
+            "in": "query",
+            "name": "exchanges",
+            "description": "Comma-separated exchange keys to keep (from the bookmakers list): `betfair_exchange`, `matchbook`, `novig`, `prophetx`, `kalshi`, `polymarket`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_edge",
+            "description": "Lowest expected value to list, in percent.",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "$ref": "#/components/parameters/MaxAge"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LayBeatOpportunities"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
     "/fair-odds": {
       "get": {
         "tags": [
@@ -5495,6 +5550,220 @@
           }
         }
       },
+      "LayBeatOpportunity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "event",
+          "market",
+          "outcome",
+          "bookmaker",
+          "bookmaker_name",
+          "decimal_odds",
+          "implied_probability",
+          "exchange",
+          "fair",
+          "ev_pct",
+          "kelly_pct",
+          "observed_at",
+          "price_age_seconds",
+          "computed_at",
+          "expires_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^op_[0-9a-f]{16}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "lay_beat"
+            ]
+          },
+          "event": {
+            "$ref": "#/components/schemas/OpportunityEvent"
+          },
+          "market": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "key",
+              "name",
+              "period",
+              "subject"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/MarketId"
+              },
+              "key": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "name": {
+                "type": "string"
+              },
+              "period": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "subject": {
+                "$ref": "#/components/schemas/MarketSubject"
+              }
+            }
+          },
+          "outcome": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "side",
+              "line"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/OutcomeId"
+              },
+              "side": {
+                "type": "string"
+              },
+              "line": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "bookmaker": {
+            "$ref": "#/components/schemas/Key"
+          },
+          "bookmaker_name": {
+            "type": "string"
+          },
+          "decimal_odds": {
+            "type": "number",
+            "exclusiveMinimum": 1
+          },
+          "implied_probability": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "exchange": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bookmaker",
+              "name",
+              "back_odds",
+              "lay_odds"
+            ],
+            "properties": {
+              "bookmaker": {
+                "$ref": "#/components/schemas/Key"
+              },
+              "name": {
+                "type": "string"
+              },
+              "back_odds": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The exchange's best back price on this outcome, where recorded."
+              },
+              "lay_odds": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "The exchange's posted lay price. Null on an order-book exchange, whose lay is implied by its other side."
+              }
+            }
+          },
+          "fair": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "probability",
+              "decimal_odds"
+            ],
+            "properties": {
+              "probability": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "decimal_odds": {
+                "type": "number",
+                "exclusiveMinimum": 1,
+                "description": "The exchange's midpoint."
+              }
+            }
+          },
+          "ev_pct": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Expected profit in percent of the stake."
+          },
+          "kelly_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Full-Kelly stake in percent of bankroll."
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the bookmaker's price was observed."
+          },
+          "price_age_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "computed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "LayBeatOpportunitiesEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data",
+          "meta",
+          "links"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LayBeatOpportunity"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
       "FairOddsEventsEnvelope": {
         "type": "object",
         "additionalProperties": false,
@@ -5810,6 +6079,16 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/EvOpportunitiesEnvelope"
+            }
+          }
+        }
+      },
+      "LayBeatOpportunities": {
+        "description": "Lay beats",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LayBeatOpportunitiesEnvelope"
             }
           }
         }
