@@ -1526,7 +1526,7 @@
           "Opportunities"
         ],
         "operationId": "listLayBeats",
-        "description": "Pro and above. Lay beats: a bookmaker price that beats an exchange's lay price net of the exchange's commission, the bookmaker side of an exchange arbitrage, listed to take on its own. `exchange` names the exchange it beats, with its own back and lay prices: `lay_odds` is the exchange's posted lay where it has one (Betfair, Matchbook); on an order-book exchange (Novig, ProphetX, Kalshi, Polymarket) the lay is implied by its other side, so `lay_odds` is null there. `fair` is the exchange's midpoint, the price the edge is measured against; `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; a row is listed only when your key may read both the bookmaker's and the exchange's prices. Freshness, paging and metering are as for arbitrage. No stake or liquidity figure is served. An estimate, not a guarantee: prices move, and an exchange's price can be thin.",
+        "description": "Pro and above. Lay beats: a bookmaker price that beats an exchange's lay price net of the exchange's commission, the bookmaker side of an exchange arbitrage, listed to take on its own. `exchange` names the exchange it beats, with its own back and lay prices: `lay_odds` is the exchange's posted lay where it has one (Betfair, Matchbook); on an order-book exchange (Novig, ProphetX, Kalshi, Polymarket) the lay is implied by its other side, so `lay_odds` is null there. `fair` is the exchange's midpoint, the price the edge is measured against; `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; a row is listed only when your key may read both the bookmaker's and the exchange's prices. `exchange.available_to_back` is the exchange's resting stake at its back price on the outcome and `exchange.matched_volume` the money matched on that market (null when the exchange did not report it): check them before relying on a thin price. Freshness, paging and metering are as for arbitrage. An estimate, not a guarantee: prices move.",
         "x-example-query": "league=nba&min_edge=2&exchanges=betfair_exchange,novig",
         "parameters": [
           {
@@ -5659,7 +5659,10 @@
               "bookmaker",
               "name",
               "back_odds",
-              "lay_odds"
+              "lay_odds",
+              "available_to_back",
+              "matched_volume",
+              "currency"
             ],
             "properties": {
               "bookmaker": {
@@ -5681,6 +5684,30 @@
                   "null"
                 ],
                 "description": "The exchange's posted lay price. Null on an order-book exchange, whose lay is implied by its other side."
+              },
+              "available_to_back": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "description": "Resting stake available at the exchange's back price on this outcome, in the exchange's own currency. Not a guaranteed account limit. Null when not reported."
+              },
+              "matched_volume": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "description": "Money matched on this exchange market so far, in the exchange's own currency. Null when not reported."
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[A-Z]{3}$",
+                "description": "The currency of the two amounts when verified; null means unknown. Never inferred from the exchange or a region."
               }
             }
           },
