@@ -1777,6 +1777,77 @@
             "description": "Pro and above. Positive expected value: a bookmaker price longer than the fair price of the outcome. `fair` says how the fair price was made: `sharp_book` (one sharp bookmaker's two-sided market with its margin removed, named in `fair.bookmaker`), `exchange` (an exchange's back and lay prices) or `consensus` (the margin-free prices of `fair.books` other bookmakers, combined; never the bookmaker being priced). `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; freshness, paging and metering are as for arbitrage. An estimate, not a guarantee: a fair price is a model of the market, and prices move.\n\nReference: https://sockodds.com/docs/#listPositiveEv"
           },
           "response": []
+        },
+        {
+          "name": "listLayBeats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/opportunities/lay-beat?league=nba&exchanges=betfair_exchange,novig&min_edge=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opportunities",
+                "lay-beat"
+              ],
+              "query": [
+                {
+                  "key": "league",
+                  "value": "nba",
+                  "description": ""
+                },
+                {
+                  "key": "bookmakers",
+                  "value": "bookmaker_key_1,bookmaker_key_2",
+                  "description": "Comma-separated bookmaker keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "markets",
+                  "value": "winner",
+                  "description": "Comma-separated market keys, at most 20.",
+                  "disabled": true
+                },
+                {
+                  "key": "exchanges",
+                  "value": "betfair_exchange,novig",
+                  "description": "Comma-separated exchange keys to keep (from the bookmakers list): `betfair_exchange`, `matchbook`, `novig`, `prophetx`, `kalshi`, `polymarket`."
+                },
+                {
+                  "key": "min_edge",
+                  "value": "2",
+                  "description": "Lowest expected value to list, in percent."
+                },
+                {
+                  "key": "max_age",
+                  "value": "600",
+                  "description": "Oldest price to use, in seconds since it was observed. An entry is listed only while every price in it is at most this old.",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Pro and above. Lay beats: a bookmaker price that beats an exchange's lay price net of the exchange's commission, the bookmaker side of an exchange arbitrage, listed to take on its own. `exchange` names the exchange it beats, with its own back and lay prices: `lay_odds` is the exchange's posted lay where it has one (Betfair, Matchbook); on an order-book exchange (Novig, ProphetX, Kalshi, Polymarket) the lay is implied by its other side, so `lay_odds` is null there. `fair` is the exchange's midpoint, the price the edge is measured against; `ev_pct` is the expected profit in percent of the stake and `kelly_pct` the full-Kelly stake in percent of bankroll. Highest `ev_pct` first. Upcoming events only; a row is listed only when your key may read both the bookmaker's and the exchange's prices. Freshness, paging and metering are as for arbitrage. No stake or liquidity figure is served. An estimate, not a guarantee: prices move, and an exchange's price can be thin.\n\nReference: https://sockodds.com/docs/#listLayBeats"
+          },
+          "response": []
         }
       ],
       "description": "Arbitrage, low holds, middles and positive expected value, computed from the prices SockOdds records. Pro and above."
